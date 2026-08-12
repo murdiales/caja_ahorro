@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Configuración del Portal Web{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white fw-bold">
+            ⚙️ Panel de Edición del Portal Web
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                <div class="row">
+                    {# Sección de Textos #}
+                    <div class="col-md-7 border-end">
+                        <h5 class="text-primary fw-bold mb-3">Textos e Información General</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Título Principal del Sitio</label>
+                            <input type="text" name="site_title" class="form-control" value="{{ configs['site_title'] ?? 'Caja de Ahorro Familiar' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Subtítulo de Bienvenida (Hero)</label>
+                            <input type="text" name="hero_subtitle" class="form-control" value="{{ configs['hero_subtitle'] ?? 'Construyendo el futuro financiero de nuestra familia juntos.' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Sobre Nosotros / Historia</label>
+                            <textarea name="about_us_text" class="form-control" rows="5" required>{{ configs['about_us_text'] ?? 'Nuestra Caja de Ahorro Familiar se creó con la finalidad de fomentar el ahorro sistemático y ofrecer soluciones de crédito accesibles a todos los socios familiares.' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Información de Contacto y Horarios</label>
+                            <textarea name="contact_info" class="form-control" rows="3" required>{{ configs['contact_info'] ?? 'Atención de Lunes a Viernes: 08:00 - 17:00 | Teléfono: 0991234567' }}</textarea>
+                        </div>
+                    </div>
+
+                    {# Sección de Multimedia / Imágenes #}
+                    <div class="col-md-5">
+                        <h5 class="text-primary fw-bold mb-3">Imágenes e Identidad Visal</h5>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Logotipo del Portal</label>
+                            <input type="file" name="logo" class="form-control mb-2">
+                            {% if configs['logo'] is defined and configs['logo'] %}
+                                <img src="{{ asset('uploads/site/' ~ configs['logo']) }}" class="img-thumbnail" style="max-height: 80px;">
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Imagen de Cabecera (Banner Principal)</label>
+                            <input type="file" name="hero_banner" class="form-control mb-2">
+                            {% if configs['hero_banner'] is defined and configs['hero_banner'] %}
+                                <img src="{{ asset('uploads/site/' ~ configs['hero_banner']) }}" class="img-fluid rounded shadow-sm" style="max-height: 180px;">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <button type="submit" class="btn btn-success fw-bold px-4">
+                    💾 Guardar y Publicar Cambios
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

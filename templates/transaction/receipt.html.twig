@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Comprobante de Transacción #{{ transaction.id }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4" style="max-width: 750px;">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Acciones del Comprobante #}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{{ path('app_account_show', {id: transaction.account.id}) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a la Cuenta
+        </a>
+
+        <div class="d-flex gap-2">
+            {# Botón Imprimir Transacción #}
+            <button onclick="window.print();" class="btn btn-secondary fw-bold">
+                <i class="bi bi-printer-fill"></i> Imprimir Transacción
+            </button>
+
+            {# Botón Descargar PDF #}
+            <a href="{{ path('app_transaction_receipt_pdf', {id: transaction.id}) }}" class="btn btn-danger fw-bold">
+                <i class="bi bi-file-earmark-pdf-fill"></i> Descargar PDF
+            </a>
+
+            {# Botón Enviar por Correo #}
+            <a href="{{ path('app_transaction_receipt_email', {id: transaction.id}) }}" class="btn btn-primary fw-bold">
+                <i class="bi bi-envelope-at-fill"></i> Enviar al Correo
+            </a>
+        </div>
+    </div>
+
+    {# Tarjeta / Papeleta del Comprobante #}
+    <div class="card shadow border-2" id="printable-receipt">
+        <div class="card-header bg-dark text-white text-center py-3">
+            <h4 class="mb-0 fw-bold">🏦 CAJA DE AHORRO</h4>
+            <small class="text-light">Comprobante Oficial de Movimiento #{{ transaction.id }}</small>
+        </div>
+        <div class="card-body p-4">
+            <div class="row mb-3">
+                <div class="col-6">
+                    <small class="text-muted d-block">TIPO DE OPERACIÓN</small>
+                    <span class="fs-5 fw-bold {% if transaction.type == 'DEPOSIT' %}text-success{% else %}text-danger{% endif %}">
+                        {% if transaction.type == 'DEPOSIT' %}📥 DEPÓSITO{% else %}📤 RETIRO{% endif %}
+                    </span>
+                </div>
+                <div class="col-6 text-end">
+                    <small class="text-muted d-block">FECHA Y HORA</small>
+                    <strong class="fs-6">{{ transaction.createdAt|date('d/m/Y H:i:s') }}</strong>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="mb-3">
+                <small class="text-muted d-block">SOCIO / TITULAR</small>
+                <h5 class="fw-bold mb-0">{{ transaction.account.user.firstName }} {{ transaction.account.user.lastName }}</h5>
+                <code>C.I.: {{ transaction.account.user.identificationNumber }}</code>
+            </div>
+
+            <div class="mb-3">
+                <small class="text-muted d-block">NÚMERO DE CUENTA</small>
+                <span class="badge bg-primary fs-6">{{ transaction.account.accountNumber }}</span>
+            </div>
+
+            <div class="mb-3">
+                <small class="text-muted d-block">CONCEPTO / MOTIVO</small>
+                <span class="fw-bold">{{ transaction.description }}</span>
+            </div>
+
+            <hr>
+
+            <div class="p-3 bg-light rounded d-flex justify-content-between align-items-center">
+                <span class="fw-bold fs-5">MONTO TRANSACCIÓN:</span>
+                <span class="fs-3 fw-bold {% if transaction.type == 'DEPOSIT' %}text-success{% else %}text-danger{% endif %}">
+                    {% if transaction.type == 'DEPOSIT' %}+{% else %}-{% endif %}${{ transaction.amount|number_format(2, '.', ',') }}
+                </span>
+            </div>
+        </div>
+        <div class="card-footer bg-white text-center py-3 text-muted small">
+            Documento generado electrónicamente por el Sistema de Caja de Ahorro.
+        </div>
+    </div>
+</div>
+{% endblock %}

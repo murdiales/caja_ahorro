@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historial de Transacciones (6 Meses) - {{ account.accountNumber }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-primary mb-1">📄 Estado de Cuenta y Transacciones</h3>
+            <p class="text-muted mb-0">Mostrando movimientos desde el {{ sixMonthsAgo|date('d/m/Y') }} hasta hoy.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_account_show', {id: account.id}) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver al Detalle
+            </a>
+            <button onclick="window.print();" class="btn btn-primary fw-bold">
+                <i class="bi bi-printer-fill"></i> Imprimir
+            </button>
+        </div>
+    </div>
+
+    {# Resumen de Cuenta #}
+    <div class="card shadow-sm border-0 mb-4 bg-white">
+        <div class="card-body row align-items-center">
+            <div class="col-md-4 border-end">
+                <small class="text-muted text-uppercase fw-bold">Titular</small>
+                <h5 class="fw-bold mb-0">{{ account.user.firstName }} {{ account.user.lastName }}</h5>
+                <small class="text-secondary">Cédula: {{ account.user.identificationNumber }}</small>
+            </div>
+            <div class="col-md-4 border-end">
+                <small class="text-muted text-uppercase fw-bold">Número de Cuenta</small>
+                <h5 class="fw-bold text-primary mb-0">{{ account.accountNumber }}</h5>
+            </div>
+            <div class="col-md-4">
+                <small class="text-muted text-uppercase fw-bold">Saldo Actual</small>
+                <h4 class="fw-bold text-success mb-0">${{ account.currentBalance|number_format(2, '.', ',') }}</h4>
+            </div>
+        </div>
+    </div>
+
+    {# Tabla Completa de Transacciones #}
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
+            <span>Historial (Últimos 6 meses)</span>
+            <span class="badge bg-secondary">{{ transactions|length }} Transacción(es)</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nº Transacción</th>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Descripción / Motivo</th>
+                            <th class="text-end">Monto ($)</th>
+                            <th class="text-center">Comprobante</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                            <tr>
+                                <td><code>#{{ tx.id }}</code></td>
+                                <td>{{ tx.createdAt|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    {% if tx.type == 'DEPOSIT' %}
+                                        <span class="badge bg-success-subtle text-success border border-success">DEPÓSITO</span>
+                                    {% elseif tx.type == 'WITHDRAWAL' %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger">RETIRO</span>
+                                    {% else %}
+                                        <span class="badge bg-info-subtle text-info border border-info">{{ tx.type }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ tx.description }}</td>
+                                <td class="text-end fw-bold {% if tx.type == 'DEPOSIT' %}text-success{% else %}text-danger{% endif %}">
+                                    {% if tx.type == 'DEPOSIT' %}+{% else %}-{% endif %}${{ tx.amount|number_format(2, '.', ',') }}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ path('app_transaction_receipt', {id: tx.id}) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-pdf"></i> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No hay transacciones registradas en los últimos 6 meses.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

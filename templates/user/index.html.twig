@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestión de Usuarios{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-primary mb-0">👥 Gestión de Usuarios y Socios</h3>
+        <a href="{{ path('app_user_new') }}" class="btn btn-success fw-bold shadow-sm">
+            <i class="bi bi-person-plus-fill"></i> Crear Nuevo Usuario
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nº</th>
+                            <th>Cédula</th>
+                            <th>Nombre Completo</th>
+                            <th>Correo Electrónico</th>
+                            <th>Rol Asignado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td><code>#{{ user.id }}</code></td>
+                                <td><code>{{ user.identificationNumber }}</code></td>
+                                <td class="fw-bold">{{ user.firstName }} {{ user.lastName }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% if 'ROLE_ADMIN' in user.roles %}
+                                        <span class="badge bg-danger">ADMINISTRADOR</span>
+                                    {% elseif 'ROLE_TREASURY' in user.roles %}
+                                        <span class="badge bg-warning text-dark">TESORERÍA</span>
+                                    {% elseif 'ROLE_SECRETARY' in user.roles %}
+                                        <span class="badge bg-info text-white">SECRETARÍA</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">SOCIO / CLIENTE</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-1">
+                                        {# Botón Reenviar Correo #}
+                                        <form method="post" action="{{ path('app_user_resend_email', {id: user.id}) }}">
+                                            <button type="submit" class="btn btn-info btn-sm text-white fw-bold" title="Reenviar correo de activación">
+                                                <i class="bi bi-envelope-at-fill"></i> Enviar Email
+                                            </button>
+                                        </form>
+
+                                        {# Botón Editar #}
+                                        <a href="{{ path('app_user_edit', {id: user.id}) }}" class="btn btn-warning btn-sm fw-bold text-dark" title="Editar datos del usuario">
+                                            ✏️ Editar
+                                        </a>
+
+                                        {# Botón Eliminar #}
+                                        <form method="post" action="{{ path('app_user_delete', {id: user.id}) }}">
+                                            <button type="submit" class="btn btn-danger btn-sm fw-bold" onclick="return confirm('¿Está seguro de eliminar este usuario?');" title="Eliminar usuario">
+                                                🗑️ Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">No existen usuarios registrados.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

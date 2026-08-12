@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Controller;
+
+use App\Repository\AccountRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+final class HomeController extends AbstractController
+{
+    #[Route('/', name: 'app_home')]
+    public function index(Request $request, AccountRepository $accountRepository): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $query = trim($request->query->get('q', ''));
+        $accounts = [];
+
+        if ($query !== '') {
+            // Buscar por Cédula, Nombre, Apellido o Número de Cuenta
+            $accounts = $accountRepository->createQueryBuilder('a')
+                ->innerJoin('a.user', 'u')
+                ->where('u.identificationNumber LIKE :q')
+                ->orWhere('u.firstName LIKE :q')
+                ->orWhere('u.lastName LIKE :q')
+                ->orWhere('a.accountNumber LIKE :q')
+                ->setParameter('q', '%' . $query . '%')
+                ->getQuery()
+                ->getResult();
+        } else {
+            // Mostrar todas las cuentas si no hay filtro de búsqueda
+            $accounts = $accountRepository->findAll();
+        }
+
+        return $this->render('home/index.html.twig', [
+            'accounts' => $accounts,
+            'query' => $query,
+        ]);
+    }
+}

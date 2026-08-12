@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Usuario #{{ user.id }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4" style="max-width: 650px;">
+    <div class="card shadow border-0">
+        <div class="card-header bg-warning text-dark fw-bold">
+            <h4 class="mb-0">✏️ Editar Usuario #{{ user.id }}</h4>
+        </div>
+        <div class="card-body p-4">
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="firstName" class="form-label fw-bold">Nombre</label>
+                        <input type="text" id="firstName" name="firstName" value="{{ user.firstName }}" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="lastName" class="form-label fw-bold">Apellido</label>
+                        <input type="text" id="lastName" name="lastName" value="{{ user.lastName }}" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="identificationNumber" class="form-label fw-bold">Cédula</label>
+                        <input type="text" id="identificationNumber" name="identificationNumber" value="{{ user.identificationNumber }}" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="role" class="form-label fw-bold">Rol</label>
+                        <select id="role" name="role" class="form-select" required>
+                            <option value="ROLE_USER" {% if 'ROLE_USER' in user.roles %}selected{% endif %}>Socio / Cliente (ROLE_USER)</option>
+                            <option value="ROLE_SECRETARY" {% if 'ROLE_SECRETARY' in user.roles %}selected{% endif %}>Secretaría (ROLE_SECRETARY)</option>
+                            <option value="ROLE_TREASURY" {% if 'ROLE_TREASURY' in user.roles %}selected{% endif %}>Tesorería (ROLE_TREASURY)</option>
+                            <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %}>Administrador (ROLE_ADMIN)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="email" class="form-label fw-bold">Correo Electrónico</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="password" class="form-label fw-bold">Nueva Contraseña (Opcional)</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Dejar en blanco para mantener la clave actual">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between pt-4">
+                    <a href="{{ path('app_user_index') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold">Actualizar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

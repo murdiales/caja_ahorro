@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; }
+        .card { background: #ffffff; padding: 25px; border-radius: 8px; max-width: 600px; margin: auto; border: 1px solid #ddd; }
+        .header { background: #dc3545; color: white; padding: 15px; border-radius: 6px; text-align: center; }
+        .details { margin-top: 20px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h2>⚠️ Solicitud No Aprobada</h2>
+        </div>
+        <div class="details">
+            <p>Estimado(a) <strong>{{ loan.account.user.firstName }} {{ loan.account.user.lastName }}</strong>,</p>
+            <p>Le informamos que su solicitud de préstamo #{{ loan.id }} por el monto de <strong>${{ loan.amount|number_format(2, '.', ',') }}</strong> no ha podido ser aprobada en esta ocasión.</p>
+
+            <hr>
+            <p>Si requiere más información o desea ingresar una nueva solicitud ajustada, le invitamos a acercarse a nuestras oficinas de ventanilla.</p>
+            <hr>
+
+            <p>Atentamente,<br><strong>Caja de Ahorro</strong></p>
+        </div>
+    </div>
+</body>
+</html>

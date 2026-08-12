@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ventanilla de Operaciones - Caja de Ahorro{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {# Mensajes de Notificación #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Encabezado #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-0">🏛️ Ventanilla de Operaciones</h2>
+            <small class="text-muted">Operador activo: {{ app.user.firstName }} {{ app.user.lastName }}</small>
+        </div>
+        <a href="{{ path('app_logout') }}" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
+    </div>
+
+    {# Buscador de Socios #}
+    <div class="card shadow-sm mb-4 border-0 bg-white">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-bold mb-3">🔍 Buscar Socio / Cuenta</h5>
+            <form method="get" action="{{ path('app_home') }}" class="row g-2">
+                <div class="col-md-10">
+                    <input type="text" 
+                           name="q" 
+                           value="{{ query }}" 
+                           class="form-control form-control-lg" 
+                           placeholder="Ingrese número de cédula, nombre, apellido o número de cuenta..." 
+                           autofocus>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold">Buscar</button>
+                </div>
+            </form>
+            {% if query %}
+                <div class="mt-2">
+                    <a href="{{ path('app_home') }}" class="text-secondary text-decoration-none small">✖ Limpiar filtro de búsqueda</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Listado de Resultados y Operaciones #}
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
+            <span>Socios Encontrados</span>
+            <span class="badge bg-secondary">{{ accounts|length }} Registro(s)</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nº Cuenta</th>
+                            <th>Cédula</th>
+                            <th>Socio</th>
+                            <th>Saldo Disponible</th>
+                            <th class="text-center">Acciones Directas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for acc in accounts %}
+                            <tr>
+                                <td><span class="badge bg-primary fs-6">{{ acc.accountNumber }}</span></td>
+                                <td><code>{{ acc.user.identificationNumber }}</code></td>
+                                <td class="fw-bold">{{ acc.user.firstName }} {{ acc.user.lastName }}</td>
+                                <td class="text-success fw-bold fs-5">
+                                    ${{ acc.currentBalance|number_format(2, '.', ',') }}
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        {# 1. Botón Ver Cuenta #}
+                                        <a href="{{ path('app_account_show', {id: acc.id}) }}" 
+                                           class="btn btn-secondary btn-sm shadow-sm px-2"
+                                           title="Consultar detalles y movimientos de la cuenta">
+                                           👁️ Ver Cuenta
+                                        </a>
+
+                                        {# 2. Botón Depósito #}
+                                        <a href="{{ path('app_transaction_deposit') }}?account_id={{ acc.id }}" 
+                                           class="btn btn-success btn-sm shadow-sm px-2">
+                                           💵 Depósito
+                                        </a>
+
+                                        {# 3. Botón Retiro #}
+                                        <a href="{{ path('app_transaction_withdraw') }}?account_id={{ acc.id }}" 
+                                           class="btn btn-warning btn-sm shadow-sm px-2 fw-bold text-dark">
+                                           💸 Retiro
+                                        </a>
+
+                                        {# 4. Botón Préstamo #}
+                                        <a href="{{ path('app_loan_request') }}?account_id={{ acc.id }}" 
+                                           class="btn btn-info btn-sm text-white shadow-sm px-2 fw-bold"
+                                           title="Solicitar préstamo para esta cuenta">
+                                           📋 Préstamo
+                                        </a>
+
+                                        {# 5. NUEVO BOTÓN: Estado de Cuenta e Intereses #}
+                                        <a href="{{ path('app_report_statement', {id: acc.user.id}) }}" 
+                                           class="btn btn-primary btn-sm shadow-sm px-2 fw-bold"
+                                           title="Consultar estado de cuenta e intereses acumulados">
+                                           📊 Estado Cuenta
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No se encontraron cuentas o socios registrados con el parámetro "{{ query }}".
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestión Documental{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row">
+        {# Subida de Archivo #}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white fw-bold">
+                    <i class="bi bi-cloud-upload me-1"></i> Subir Nuevo Documento
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('app_document_upload') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Título del Documento</label>
+                            <input type="text" name="title" class="form-control" placeholder="Ej. Acta de Asamblea Ordinaria" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Categoría</label>
+                            <select name="category" class="form-select" required>
+                                <option value="ACTA">Acta de Reunión</option>
+                                <option value="REGLAMENTO">Reglamento</option>
+                                <option value="DIRECTIVA">Directiva / Resolución</option>
+                                <option value="OTRO">Otro Documento</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Archivo (PDF, Word, Imagen)</label>
+                            <input type="file" name="file" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">
+                            <i class="bi bi-file-earmark-arrow-up me-1"></i> Subir Documento
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# Listado y Filtros #}
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body p-2 d-flex gap-2">
+                    <a href="{{ path('app_document_index') }}" class="btn btn-sm {{ currentCategory is null ? 'btn-dark' : 'btn-outline-dark' }}">Todos</a>
+                    <a href="{{ path('app_document_index', {'category': 'ACTA'}) }}" class="btn btn-sm {{ currentCategory == 'ACTA' ? 'btn-primary' : 'btn-outline-primary' }}">Actas de Reunión</a>
+                    <a href="{{ path('app_document_index', {'category': 'REGLAMENTO'}) }}" class="btn btn-sm {{ currentCategory == 'REGLAMENTO' ? 'btn-info text-white' : 'btn-outline-info' }}">Reglamentos</a>
+                    <a href="{{ path('app_document_index', {'category': 'DIRECTIVA'}) }}" class="btn btn-sm {{ currentCategory == 'DIRECTIVA' ? 'btn-warning' : 'btn-outline-warning' }}">Directivas</a>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="bi bi-folder2-open me-1"></i> Documentos Registrados
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0 text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Categoría</th>
+                                <th class="text-start">Título</th>
+                                <th>Fecha Subida</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documents %}
+                                <tr>
+                                    <td>
+                                        {% if doc.category == 'ACTA' %}<span class="badge bg-primary">Acta</span>{% endif %}
+                                        {% if doc.category == 'REGLAMENTO' %}<span class="badge bg-info text-dark">Reglamento</span>{% endif %}
+                                        {% if doc.category == 'DIRECTIVA' %}<span class="badge bg-warning text-dark">Directiva</span>{% endif %}
+                                        {% if doc.category == 'OTRO' %}<span class="badge bg-secondary">Otro</span>{% endif %}
+                                    </td>
+                                    <td class="text-start fw-bold">{{ doc.title }}</td>
+                                    <td>{{ doc.uploadedAt|date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <a href="{{ asset('uploads/documents/' ~ doc.filePath) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-download me-1"></i> Descargar / Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-muted py-4">No hay documentos cargados en esta categoría.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

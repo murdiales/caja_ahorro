@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Realizar Retiro{% endblock %}
+
+{% block body %}
+<div class="container mt-5" style="max-width: 650px;">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card shadow border-0">
+        <div class="card-header bg-warning text-dark fw-bold">
+            <h4 class="mb-0">💸 Retiro de Cuenta de Ahorro</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {# Selección de Cuenta Origen #}
+                <div class="mb-3">
+                    <label for="account_id" class="form-label fw-bold">Seleccionar Cuenta Origen</label>
+                    <select id="account_id" name="account_id" class="form-select" required>
+                        <option value="" disabled {% if not selectedAccountId %}selected{% endif %}>-- Seleccione una cuenta --</option>
+                        {% for acc in accounts %}
+                            <option value="{{ acc.id }}" {% if selectedAccountId and selectedAccountId == acc.id %}selected{% endif %}>
+                                {{ acc.accountNumber }} - {{ acc.user.firstName }} {{ acc.user.lastName }} (Saldo: ${{ acc.currentBalance|number_format(2, '.', ',') }})
+                            </option>
+                        {% else %}
+                            <option value="" disabled>No hay cuentas registradas en el sistema</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Monto del Retiro #}
+                <div class="mb-3">
+                    <label for="amount" class="form-label fw-bold">Monto a Retirar ($)</label>
+                    <input type="number" step="0.01" min="0.01" id="amount" name="amount" class="form-control" placeholder="Ej. 50.00" required>
+                </div>
+
+                {# Descripción / Motivo #}
+                <div class="mb-3">
+                    <label for="description" class="form-label fw-bold">Descripción / Motivo</label>
+                    <select id="description" name="description" class="form-select" required>
+                        <option value="" disabled selected>-- Seleccione un motivo --</option>
+                        {% for reason in reasons %}
+                            <option value="{{ reason }}">{{ reason }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="d-flex justify-content-between pt-2">
+                    <a href="{{ path('app_home') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-warning fw-bold text-dark">Confirmar Retiro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

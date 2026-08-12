@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Estado de Cuenta - {{ user.firstName }} {{ user.lastName }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i>Estado de Cuenta de Aportes e Intereses</h4>
+            <a href="{{ path('app_report_statement_pdf', {'id': user.id, 'start_date': startDate, 'end_date': endDate}) }}" class="btn btn-light btn-sm fw-bold" target="_blank">
+                <i class="fas fa-file-pdf text-danger me-1"></i> Descargar PDF
+            </a>
+        </div>
+        <div class="card-body">
+            {# Datos del Socio #}
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Socio:</strong> {{ user.firstName }} {{ user.lastName }}</p>
+                    <p class="mb-0"><strong>Cédula:</strong> {{ user.identificationNumber }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0"><strong>Correo:</strong> {{ user.email }}</p>
+                </div>
+            </div>
+
+            <hr>
+
+            {# Formulario de Filtro por Fechas #}
+            <form method="get" class="row g-3 align-items-end mb-4">
+                <div class="col-md-4">
+                    <label for="start_date" class="form-label fw-bold">Fecha Desde</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ startDate }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date" class="form-label fw-bold">Fecha Hasta</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ endDate }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-secondary w-100 fw-bold">
+                        <i class="fas fa-filter me-1"></i> Filtrar Registros
+                    </button>
+                </div>
+            </form>
+
+            {# Tabla de Desglose Mensual #}
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle text-center mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Año / Mes</th>
+                            <th>Capital Base (Aportes)</th>
+                            <th>Aportes del Mes</th>
+                            <th>Tasa %</th>
+                            <th>Interés Ganado</th>
+                            <th>Total Aportes Acumulados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                            <tr>
+                                <td><span class="badge bg-info text-dark fs-6">{{ log.year }} - {{ "%02d"|format(log.month) }}</span></td>
+                                <td>${{ log.baseCapital|number_format(2) }}</td>
+                                <td class="text-success fw-bold">+${{ log.newDeposits|number_format(2) }}</td>
+                                <td>{{ log.appliedRate }}%</td>
+                                <td class="text-primary fw-bold">+${{ log.earnedInterest|number_format(2) }}</td>
+                                <td class="fw-bold">${{ log.totalAccumulated|number_format(2) }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-muted py-4">No se encontraron registros de aportes o intereses en el rango de fechas seleccionado.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Resumen de Intereses al Cierre de Año #}
+            {% set totalInteresesAno = 0 %}
+            {% set totalAportesAno = 0 %}
+            {% for log in logs %}
+                {% set totalInteresesAno = totalInteresesAno + log.earnedInterest %}
+                {% set totalAportesAno = log.totalAccumulated %}
+            {% endfor %}
+
+            <div class="row mt-4">
+                <div class="col-md-6 offset-md-6">
+                    <div class="card bg-light border-primary shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary fw-bold mb-3">
+                                🪙 Resumen al 31 de Diciembre
+                            </h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Total Aportes Acumulados:</span>
+                                <strong class="text-dark">${{ totalAportesAno|number_format(2) }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Total Intereses A pagar (Entregar en físico):</span>
+                                <strong class="text-success fs-5">+${{ totalInteresesAno|number_format(2) }}</strong>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Saldo Total Cierre Fiscal:</span>
+                                <span class="text-primary fs-5">${{ (totalAportesAno + totalInteresesAno)|number_format(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

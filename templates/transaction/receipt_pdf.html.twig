@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprobante #{{ transaction.id }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .row { margin-bottom: 10px; }
+        .label { font-weight: bold; color: #555; }
+        .amount-box { background: #f4f4f4; border: 1px solid #ccc; padding: 12px; font-size: 18px; text-align: right; font-weight: bold; margin-top: 20px; }
+        .deposit { color: #198754; }
+        .withdrawal { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 style="margin: 0;">CAJA DE AHORRO</h2>
+        <p style="margin: 5px 0 0 0;">Comprobante de Movimiento #{{ transaction.id }}</p>
+    </div>
+
+    <div class="row">
+        <span class="label">Fecha / Hora:</span> {{ transaction.createdAt|date('d/m/Y H:i:s') }}
+    </div>
+    <div class="row">
+        <span class="label">Tipo Operación:</span> 
+        <strong class="{% if transaction.type == 'DEPOSIT' %}deposit{% else %}withdrawal{% endif %}">
+            {% if transaction.type == 'DEPOSIT' %}DEPÓSITO{% else %}RETIRO{% endif %}
+        </strong>
+    </div>
+    <div class="row">
+        <span class="label">Socio:</span> {{ transaction.account.user.firstName }} {{ transaction.account.user.lastName }}
+    </div>
+    <div class="row">
+        <span class="label">Cédula:</span> {{ transaction.account.user.identificationNumber }}
+    </div>
+    <div class="row">
+        <span class="label">Número de Cuenta:</span> {{ transaction.account.accountNumber }}
+    </div>
+    <div class="row">
+        <span class="label">Motivo / Descripción:</span> {{ transaction.description }}
+    </div>
+
+    <div class="amount-box">
+        MONTO: 
+        <span class="{% if transaction.type == 'DEPOSIT' %}deposit{% else %}withdrawal{% endif %}">
+            {% if transaction.type == 'DEPOSIT' %}+{% else %}-{% endif %}${{ transaction.amount|number_format(2, '.', ',') }}
+        </span>
+    </div>
+
+    <div style="margin-top: 40px; text-align: center; font-size: 11px; color: #777;">
+        Gracias por utilizar nuestros servicios financieros.
+    </div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Solicitudes y Aprobaciones{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <h3 class="fw-bold text-primary mb-3">📋 Solicitudes Pendientes de Aprobación</h3>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nº</th>
+                            <th>Socio</th>
+                            <th>Monto Solicitado</th>
+                            <th>Plazo</th>
+                            <th>Cuota Estimada</th>
+                            <th>Fecha</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in loans %}
+                            <tr>
+                                <td><code>#{{ loan.id }}</code></td>
+                                <td class="fw-bold">{{ loan.account.user.firstName }} {{ loan.account.user.lastName }}</td>
+                                <td class="text-success fw-bold">${{ loan.amount|number_format(2, '.', ',') }}</td>
+                                <td>{{ loan.termMonths }} Meses</td>
+                                <td>${{ loan.monthlyFee|number_format(2, '.', ',') }}/mes</td>
+                                <td class="small">{{ loan.requestedAt|date('d/m/Y H:i') }}</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        {# Botón Aprobar #}
+                                        <form method="post" action="{{ path('app_loan_approve', {id: loan.id}) }}">
+                                            <button type="submit" class="btn btn-success btn-sm fw-bold" onclick="return confirm('¿Aprobar y desembolsar este préstamo?');">
+                                                ✔ Aprobar
+                                            </button>
+                                        </form>
+
+                                        {# Botón Rechazar #}
+                                        <form method="post" action="{{ path('app_loan_reject', {id: loan.id}) }}">
+                                            <button type="submit" class="btn btn-danger btn-sm fw-bold" onclick="return confirm('¿Está seguro de rechazar esta solicitud de préstamo?');">
+                                                ✖ Rechazar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    No hay solicitudes de préstamo pendientes.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

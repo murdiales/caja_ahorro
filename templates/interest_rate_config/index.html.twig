@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Configuración de Tasas de Interés{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row">
+        {# Formulario para establecer nueva tasa #}
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white fw-bold">
+                    ⚙️ Establecer Nueva Tasa
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('app_interest_rate_new') }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tasa de Interés Mensual (%)</label>
+                            <input type="number" step="0.01" name="rate" class="form-control" placeholder="Ej. 1.50" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Vigente Desde</label>
+                            <input type="date" name="start_date" class="form-control" value="{{ "now"|date("Y-m-d") }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">
+                            Guardar Tasa
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# Historial de Tasas #}
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white fw-bold">
+                    📜 Historial de Tasas de Interés
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0 text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tasa %</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rates %}
+                                <tr>
+                                    <td class="fw-bold fs-5 text-primary">{{ r.rate }}%</td>
+                                    <td>{{ r.startDate|date('d/m/Y') }}</td>
+                                    <td>{{ r.endDate ? r.endDate|date('d/m/Y') : 'Actualidad' }}</td>
+                                    <td>
+                                        {% if r.endDate is null %}
+                                            <span class="badge bg-success">Vigente</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactiva</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-muted py-3">No hay tasas registradas. Se está usando 1.00% por defecto.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

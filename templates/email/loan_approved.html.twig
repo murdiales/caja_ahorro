@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; }
+        .card { background: #ffffff; padding: 25px; border-radius: 8px; max-width: 600px; margin: auto; border: 1px solid #ddd; }
+        .header { background: #198754; color: white; padding: 15px; border-radius: 6px; text-align: center; }
+        .details { margin-top: 20px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h2>🎉 ¡Préstamo Aprobado!</h2>
+        </div>
+        <div class="details">
+            <p>Estimado(a) <strong>{{ loan.account.user.firstName }} {{ loan.account.user.lastName }}</strong>,</p>
+            <p>Nos complace informarle que su solicitud de préstamo ha sido <strong>APROBADA</strong> con éxito y los fondos han sido acreditados a su cuenta de ahorro.</p>
+
+            <hr>
+            <p><strong>Detalles del Préstamo:</strong></p>
+            <ul>
+                <li><strong>Monto Acreditado:</strong> ${{ loan.amount|number_format(2, '.', ',') }}</li>
+                <li><strong>Plazo:</strong> {{ loan.termMonths }} Meses</li>
+                <li><strong>Cuota Mensual:</strong> ${{ loan.monthlyFee|number_format(2, '.', ',') }}</li>
+                <li><strong>Número de Cuenta:</strong> {{ loan.account.accountNumber }}</li>
+            </ul>
+            <hr>
+
+            <p>Gracias por confiar en nuestra Caja de Ahorro.</p>
+        </div>
+    </div>
+</body>
+</html>

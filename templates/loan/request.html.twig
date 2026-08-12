@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Solicitud de Préstamo{% endblock %}
+
+{% block body %}
+<div class="container mt-5" style="max-width: 650px;">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card shadow border-0">
+        <div class="card-header bg-info text-white fw-bold">
+            <h4 class="mb-0">📋 Solicitud de Préstamo</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {# Selección de Cuenta del Socio #}
+                <div class="mb-3">
+                    <label for="account_id" class="form-label fw-bold">Cuenta del Socio</label>
+                    <select id="account_id" name="account_id" class="form-select" required>
+                        <option value="" disabled {% if not selectedAccountId %}selected{% endif %}>-- Seleccione la cuenta --</option>
+                        {% for acc in accounts %}
+                            <option value="{{ acc.id }}" {% if selectedAccountId and selectedAccountId == acc.id %}selected{% endif %}>
+                                {{ acc.accountNumber }} - {{ acc.user.firstName }} {{ acc.user.lastName }} (Saldo: ${{ acc.currentBalance|number_format(2, '.', ',') }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Monto del Préstamo #}
+                <div class="mb-3">
+                    <label for="amount" class="form-label fw-bold">Monto del Préstamo ($)</label>
+                    <input type="number" step="100" min="100" id="amount" name="amount" class="form-control" placeholder="Ej. 1000.00" required>
+                </div>
+
+                {# Plazo de Devolución (Numérico de 1 a 60 Meses) #}
+                <div class="mb-3">
+                    <label for="term_months" class="form-label fw-bold">Plazo de Devolución (Número de Meses)</label>
+                    <input type="number" 
+                           min="1" 
+                           max="60" 
+                           id="term_months" 
+                           name="term_months" 
+                           class="form-control" 
+                           placeholder="Ingrese número de meses (Máx. 60)" 
+                           required>
+                    <div class="form-text">Puede ingresar cualquier plazo desde 1 hasta un máximo de 60 meses (5 años).</div>
+                </div>
+
+                <div class="d-flex justify-content-between pt-2">
+                    <a href="{{ path('app_home') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-info text-white fw-bold">Enviar Solicitud</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

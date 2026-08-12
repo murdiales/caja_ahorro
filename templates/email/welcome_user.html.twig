@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 20px; color: #333; }
+        .container { max-width: 600px; background: #ffffff; margin: 0 auto; padding: 30px; border-radius: 8px; border: 1px solid #e0e0e0; }
+        .header { background-color: #0d6efd; color: #ffffff; text-align: center; padding: 15px; border-radius: 6px; }
+        .content { margin-top: 20px; line-height: 1.6; }
+        .account-box { background-color: #e9ecef; border-left: 5px solid #0d6efd; padding: 15px; margin: 20px 0; font-size: 16px; }
+        .btn { display: inline-block; background-color: #198754; color: #ffffff !important; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 15px; }
+        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2 style="margin: 0;">🏦 Caja de Ahorro</h2>
+        </div>
+
+        <div class="content">
+            <p>Estimado(a) <strong>{{ user.firstName }} {{ user.lastName }}</strong>,</p>
+
+            <p>Le damos una cordial bienvenida a nuestro sistema de <strong>Caja de Ahorro</strong>. Su usuario ha sido registrado exitosamente.</p>
+
+            <div class="account-box">
+                <strong>📌 Su Número de Cuenta de Ahorros asignado es:</strong><br>
+                <span style="font-size: 22px; font-weight: bold; color: #0d6efd;">{{ accountNumber }}</span>
+            </div>
+
+            <p>Para garantizar la seguridad de su cuenta, le solicitamos establecer su contraseña personal haciendo clic en el siguiente enlace:</p>
+
+            <div style="text-align: center;">
+                <a href="{{ resetUrl }}" class="btn">Establecer / Cambiar mi Contraseña</a>
+            </div>
+
+            <p style="margin-top: 25px; font-size: 13px; color: #555;">
+                Si el botón anterior no funciona, copie y pegue el siguiente enlace en su navegador:<br>
+                <code>{{ resetUrl }}</code>
+            </p>
+        </div>
+
+        <div class="footer">
+            Este es un correo automático generado por el Sistema de Caja de Ahorro. Por favor no responda a este mensaje.
+        </div>
+    </div>
+</body>
+</html>
