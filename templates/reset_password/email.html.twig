@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña - Caja de Ahorro</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f6f9; font-family: 'Segoe UI', Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+        <tr>
+            <td align="center" style="padding: 40px 10px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 550px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
+                    
+                    {# Cabecera #}
+                    <tr>
+                        <td align="center" style="background-color: #0d6efd; padding: 25px 20px;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px;">Caja de Ahorro</h1>
+                        </td>
+                    </tr>
+
+                    {# Cuerpo #}
+                    <tr>
+                        <td style="padding: 30px; color: #333333; font-size: 15px; line-height: 1.6;">
+                            <h2 style="color: #212529; font-size: 18px; margin-top: 0; margin-bottom: 15px; font-weight: 600;">
+                                ¡Hola!
+                            </h2>
+                            <p style="margin-top: 0; margin-bottom: 20px; color: #495057;">
+                                Recibimos una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el siguiente botón para crear una nueva contraseña:
+                            </p>
+                            
+                            {# Botón Call to Action #}
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 25px;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ url('app_reset_password', {token: resetToken.token}) }}" target="_blank" style="background-color: #0d6efd; color: #ffffff; display: inline-block; padding: 12px 30px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 5px; box-shadow: 0 2px 5px rgba(13,110,253,0.3);">
+                                            Restablecer contraseña
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            {# Bloque informativo de tiempo #}
+                            <div style="background-color: #f8f9fa; border-left: 4px solid #0d6efd; padding: 12px 15px; border-radius: 4px; margin-bottom: 20px;">
+                                <p style="margin: 0; font-size: 13px; color: #6c757d;">
+                                    Este enlace caducará en <strong>{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</strong>.
+                                </p>
+                            </div>
+
+                            <p style="margin: 0; font-size: 13px; color: #8c98a4;">
+                                Si no solicitaste este cambio, puedes ignorar este correo con total seguridad. Tu contraseña no cambiará hasta que accedas al enlace superior.
+                            </p>
+                        </td>
+                    </tr>
+
+                    {# Pie de página #}
+                    <tr>
+                        <td align="center" style="background-color: #f8f9fa; padding: 15px 20px; font-size: 12px; color: #888888; border-top: 1px solid #e9ecef;">
+                            Este es un correo automático generado por el sistema de <strong>Caja de Ahorro</strong>.
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

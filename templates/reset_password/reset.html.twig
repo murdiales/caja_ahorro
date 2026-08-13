@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva Contraseña - Caja de Ahorro{% endblock %}
+
+{% block body %}
+<div class="container mt-5" style="max-width: 480px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <div class="display-6 text-primary mb-2">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <h1 class="h3 fw-bold text-dark mb-1">Nueva Contraseña</h1>
+                <p class="text-muted small">Ingresa tu nueva contraseña para actualizar las credenciales de tu cuenta.</p>
+            </div>
+
+            {{ form_start(resetForm) }}
+                <div class="mb-3">
+                    {{ form_label(resetForm.plainPassword.first, 'Nueva contraseña', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(resetForm.plainPassword.first, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': '••••••••',
+                            'autofocus': 'autofocus'
+                        }
+                    }) }}
+                    <div class="form-text text-danger small">
+                        {{ form_errors(resetForm.plainPassword.first) }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {{ form_label(resetForm.plainPassword.second, 'Repetir contraseña', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(resetForm.plainPassword.second, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': '••••••••'
+                        }
+                    }) }}
+                    <div class="form-text text-danger small">
+                        {{ form_errors(resetForm.plainPassword.second) }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                    <i class="bi bi-check-circle me-1"></i> Guardar nueva contraseña
+                </button>
+            {{ form_end(resetForm) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

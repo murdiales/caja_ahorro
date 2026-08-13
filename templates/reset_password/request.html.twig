@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Restablecer Contraseña - Caja de Ahorro{% endblock %}
+
+{% block body %}
+<div class="container mt-5" style="max-width: 480px;">
+    {% for flash_error in app.flashes('reset_password_error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ flash_error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <div class="display-6 text-primary mb-2">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <h1 class="h3 fw-bold text-dark mb-1">Restablecer contraseña</h1>
+                <p class="text-muted small">
+                    Ingresa tu correo electrónico registrado y te enviaremos un enlace para restablecer tu contraseña.
+                </p>
+            </div>
+
+            {{ form_start(requestForm) }}
+                <div class="mb-4">
+                    {{ form_label(requestForm.email, 'Correo Electrónico', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                    {{ form_widget(requestForm.email, {'attr': {
+                        'class': 'form-control',
+                        'placeholder': 'ejemplo@correo.com',
+                        'autofocus': 'autofocus'
+                    }}) }}
+                    <div class="form-text text-danger small">
+                        {{ form_errors(requestForm.email) }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mb-3">
+                    <i class="bi bi-envelope-paper me-1"></i> Enviar correo de recuperación
+                </button>
+
+                <div class="text-center">
+                    <a href="{{ path('app_login') }}" class="text-decoration-none small text-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al inicio de sesión
+                    </a>
+                </div>
+            {{ form_end(requestForm) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
