@@ -42,3 +42,23 @@ Capital del Mes Anterior
 
 Generación automática:
 Sí
+
+## Casos de Negocio Aprobados
+
+
+Caso 1
+Depósito: 01/08/2026
+Elegibilidad: 28/09/2026
+
+Caso 2
+Depósito: 31/08/2026
+Elegibilidad: 28/09/2026
+
+Caso 3
+Depósito: 01/09/2026
+Elegibilidad: 28/10/2026
+
+Caso 4
+Depósitos múltiples durante el mismo mes
+Se consolidan en el capital elegible del período.
+
