@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Controller;
+
+use App\Repository\SystemConfigRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class FinancialConfigController extends AbstractController
+{
+    #[Route(
+        '/gestion-financiera/configuracion',
+        name: 'app_financial_config'
+    )]
+    public function index(
+        SystemConfigRepository $repository
+    ): Response {
+
+        $configs = [];
+
+        foreach ($repository->findAll() as $config) {
+            $configs[
+                $config->getConfigKey()
+            ] = $config->getConfigValue();
+        }
+
+        return $this->render(
+            'financial_config/index.html.twig',
+            [
+                'configs' => $configs
+            ]
+        );
+    }
+}

@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+Configuración Financiera
+{% endblock %}
+
+{% block body %}
+
+<div class="container my-4">
+
+    <h2 class="fw-bold mb-4">
+        ⚙ Configuración Financiera
+    </h2>
+
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-primary text-white">
+            Política Financiera
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <th>Día de Corte</th>
+                    <td>{{ configs.interest_cutoff_day }}</td>
+                </tr>
+
+                <tr>
+                    <th>Regla de Elegibilidad</th>
+                    <td>{{ configs.interest_eligibility_rule }}</td>
+                </tr>
+
+                <tr>
+                    <th>Generación Automática</th>
+                    <td>
+                        {% if configs.interest_auto_generation == '1' %}
+                            Sí
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Modo de Capitalización</th>
+                    <td>{{ configs.interest_accrual_mode }}</td>
+                </tr>
+
+            </table>
+
+            <div class="alert alert-info">
+
+                <strong>Política vigente:</strong>
+
+                Todo depósito realizado durante un mes
+                comienza a generar intereses
+                en el corte del día 28 del mes siguiente.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
