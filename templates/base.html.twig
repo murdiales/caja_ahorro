@@ -89,11 +89,11 @@
                         </li>
                         {% endif %}
 
-                        {# Módulo 4: Informes Financieros #}
+                        {# Módulo 4: Gestión Financiera #}
                         {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-file-earmark-bar-graph-fill"></i> Informes Financieros
+                            <i class="bi bi-cash-coin"></i> Gestión Financiera                                
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ path('app_interest_rate_index') }}"><i class="bi bi-percent text-warning"></i> Configuración de Tasas de Interés</a></li>
