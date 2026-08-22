@@ -62,3 +62,44 @@ Caso 4
 Depósitos múltiples durante el mismo mes
 Se consolidan en el capital elegible del período.
 
+## Capital Elegible
+
+El Capital Elegible no corresponde al saldo actual de la cuenta.
+
+Para cada corte mensual se considerará únicamente el saldo consolidado
+del período que haya cumplido la carencia institucional.
+
+Los movimientos realizados durante el mes inmediatamente anterior al corte
+no participarán en el cálculo de intereses hasta el siguiente período elegible.
+
+### Ejemplos
+
+Corte: 28/09/2026
+
+Elegible:
+Movimientos comprendidos entre 01/08/2026 y 31/08/2026.
+
+No elegible:
+Movimientos comprendidos entre 01/09/2026 y 27/09/2026.
+
+---
+
+01/08/2026 + 100
+15/08/2026 + 200
+31/08/2026 + 300
+
+Capital Elegible:
+600
+
+Genera interés:
+28/09/2026
+
+---
+
+01/09/2026 + 500
+
+No genera interés:
+28/09/2026
+
+Genera interés:
+28/10/2026
