@@ -1,0 +1,6 @@
+src/Command/CreateUserCommand.php:        $user->setRoles(['ROLE_ADMIN']);
+src/Entity/User.php:        $roles[] = 'ROLE_USER';
+src/Controller/UserController.php:            $role = $request->request->get('role', 'ROLE_USER');
+config/packages/security.yaml:        # - { path: ^/admin, roles: ROLE_ADMIN }
+config/packages/security.yaml:        # - { path: ^/profile, roles: ROLE_USER }
+config/reference.php: *             role?: scalar|Param|null, // Default: "ROLE_ALLOWED_TO_SWITCH"

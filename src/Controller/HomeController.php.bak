@@ -31,27 +31,10 @@ final class HomeController extends AbstractController
                 ->setParameter('q', '%' . $query . '%')
                 ->getQuery()
                 ->getResult();
-
         } else {
-
-            if (
-                $this->isGranted('ROLE_ADMIN')
-                || $this->isGranted('ROLE_TESORERO')
-            ) {
-
-                // Administradores y tesoreros ven todas las cuentas
-                $accounts = $accountRepository->findAll();
-
-    } else {
-
-        // Usuarios normales y secretarios solo ven sus propias cuentas
-        $accounts = $accountRepository->findBy([
-        
-            'user' => $this->getUser()
-        ]);
-
-    }
- }
+            // Mostrar todas las cuentas si no hay filtro de búsqueda
+            $accounts = $accountRepository->findAll();
+        }
 
         return $this->render('home/index.html.twig', [
             'accounts' => $accounts,

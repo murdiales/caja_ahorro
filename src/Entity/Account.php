@@ -42,11 +42,18 @@ class Account
     #[ORM\OneToMany(targetEntity: Loan::class, mappedBy: 'account')]
     private Collection $loans;
 
+    /**
+     * @var Collection<int, InterestAccrual>
+     */
+    #[ORM\OneToMany(targetEntity: InterestAccrual::class, mappedBy: 'account')]
+    private Collection $interestAccruals;
+
     public function __construct()
     {
         $this->openedAt = new \DateTime();
         $this->transactions = new ArrayCollection();
         $this->loans = new ArrayCollection();
+        $this->interestAccruals = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -162,6 +169,36 @@ class Account
             // set the owning side to null (unless already changed)
             if ($loan->getAccount() === $this) {
                 $loan->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, InterestAccrual>
+     */
+    public function getInterestAccruals(): Collection
+    {
+        return $this->interestAccruals;
+    }
+
+    public function addInterestAccrual(InterestAccrual $interestAccrual): static
+    {
+        if (!$this->interestAccruals->contains($interestAccrual)) {
+            $this->interestAccruals->add($interestAccrual);
+            $interestAccrual->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterestAccrual(InterestAccrual $interestAccrual): static
+    {
+        if ($this->interestAccruals->removeElement($interestAccrual)) {
+            // set the owning side to null (unless already changed)
+            if ($interestAccrual->getAccount() === $this) {
+                $interestAccrual->setAccount(null);
             }
         }
 

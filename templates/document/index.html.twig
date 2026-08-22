@@ -14,6 +14,8 @@
     {% endfor %}
 
     <div class="row">
+        
+        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_SECRETARIO') %}
         {# Subida de Archivo #}
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm border-0">
@@ -46,6 +48,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
 
         {# Listado y Filtros #}
         <div class="col-md-8">

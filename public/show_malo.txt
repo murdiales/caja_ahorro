@@ -42,58 +42,96 @@
         </div>
     </div>
 
-    {# TARJETAS DE MÉTRICAS FINANCIERAS #}
-    <div class="row g-3 mb-3">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
-                <div class="card-body p-3">
-                    <div class="text-muted text-uppercase small fw-bold mb-1">Capital Ahorrado</div>
-                    <h5 class="text-primary fw-bold mb-0">
-                        ${{ account.currentBalance|number_format(2, '.', ',') }}
-                    </h5>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
-                <div class="card-body p-3">
-                    <div class="text-muted text-uppercase small fw-bold mb-1">Interés Acumulado</div>
-                    <h5 class="text-warning fw-bold mb-0">
-                        ${{ accumulatedInterest|number_format(2, '.', ',') }}
-                    </h5>
-                </div>
-            </div>
-        </div>
+{# TARJETAS DE MÉTRICAS FINANCIERAS #}
+<div class="row g-3 mb-3">
 
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
-                <div class="card-body p-3">
-                    <div class="text-muted text-uppercase small fw-bold mb-1">Saldo Disponible</div>
-                    <h5 class="text-success fw-bold mb-0">
-                        ${{ availableBalance|number_format(2, '.', ',') }}
-                    </h5>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
+            <div class="card-body p-3">
+                <div class="text-muted text-uppercase small fw-bold mb-1">
+                    Capital Ahorrado
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
-                <div class="card-body p-3">
-                    <div class="text-muted text-uppercase small fw-bold mb-1">Tasa Vigente</div>
-                    <h5 class="text-info fw-bold mb-0">
-                        {{ currentRate|number_format(2, '.', ',') }}%
-                    </h5>
-                </div>
+                <h5 class="text-primary fw-bold mb-0">
+                    ${{ account.currentBalance|number_format(2, '.', ',') }}
+                </h5>
             </div>
         </div>
     </div>
 
-    <div class="text-center mb-4">
-        <small class="text-muted fw-bold">
-            <i class="bi bi-calendar-event me-1"></i> Próximo corte:
-            {{ nextCutoff|date('d/m/Y') }}
-        </small>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
+            <div class="card-body p-3">
+                <div class="text-muted text-uppercase small fw-bold mb-1">
+                    Interés Acumulado
+                </div>
+
+                <h5 class="text-warning fw-bold mb-0">
+                    ${{ accumulatedInterest|number_format(2, '.', ',') }}
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
+            <div class="card-body p-3">
+                <div class="text-muted text-uppercase small fw-bold mb-1">
+                    Saldo Disponible
+                </div>
+
+                <h5 class="text-success fw-bold mb-0">
+                    ${{ availableBalance|number_format(2, '.', ',') }}
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
+            <div class="card-body p-3">
+                <div class="text-muted text-uppercase small fw-bold mb-1">
+                    Tasa Vigente
+                </div>
+
+                <h5 class="text-info fw-bold mb-0">
+                    {{ currentRate|number_format(2, '.', ',') }}%
+                </h5>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="text-center mb-4">
+    <small class="text-muted fw-bold">
+        Próximo corte:
+        {{ nextCutoff|date('d/m/Y') }}
+    </small>
+</div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
+                <div class="card-body p-4">
+                    <div class="text-muted text-uppercase small fw-bold mb-1">Interés Acumulado</div>
+                    <h3 class="text-warning fw-bold mb-0">
+                        ${{ accumulatedInterest|number_format(2, '.', ',') }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 text-center h-100 bg-white">
+                <div class="card-body p-4">
+                    <div class="text-muted text-uppercase small fw-bold mb-1">Saldo Disponible</div>
+                    <h3 class="text-success fw-bold mb-0">
+                        ${{ availableBalance|number_format(2, '.', ',') }}
+                    </h3>
+                </div>
+            </div>
+        </div>
     </div>
 
     {# BOTONERA DE ACCIONES RÁPIDAS #}
@@ -101,28 +139,28 @@
         {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
             <a href="{{ path('app_transaction_deposit') }}?account_id={{ account.id }}"
                class="btn btn-success fw-bold shadow-sm rounded-3 px-3">
-                <i class="bi bi-cash-stack me-1"></i> Realizar Depósito
+                💵 Realizar Depósito
             </a>
 
             <a href="{{ path('app_transaction_withdraw') }}?account_id={{ account.id }}"
                class="btn btn-warning text-dark fw-bold shadow-sm rounded-3 px-3">
-                <i class="bi bi-wallet2 me-1"></i> Realizar Retiro
+                💸 Realizar Retiro
             </a>
         {% endif %}
 
         <a href="{{ path('app_loan_request') }}?account_id={{ account.id }}"
            class="btn btn-info text-white fw-bold shadow-sm rounded-3 px-3">
-            <i class="bi bi-file-earmark-text me-1"></i> Solicitar Préstamo
+            📋 Solicitar Préstamo
         </a>
 
         <a href="{{ path('app_account_transactions', {'id': account.id}) }}"
            class="btn btn-dark fw-bold shadow-sm rounded-3 px-3">
-            <i class="bi bi-file-spreadsheet me-1"></i> Estado de Cuenta (6 meses)
+            📄 Estado de Cuenta (6 meses)
         </a>
     </div>
 
     {# HISTORIAL DE MOVIMIENTOS #}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card-header bg-primary text-white fw-bold p-3 d-flex justify-content-between align-items-center">
             <span class="fs-6">
                 <i class="bi bi-clock-history me-1"></i> Últimos 10 Movimientos
@@ -191,58 +229,6 @@
             <button onclick="window.print();" class="btn btn-outline-secondary btn-sm fw-bold rounded-3">
                 <i class="bi bi-printer-fill me-1"></i> Imprimir
             </button>
-        </div>
-    </div>
-
-    {# HISTORIAL DE INTERESES #}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-warning text-dark fw-bold p-3 d-flex justify-content-between align-items-center">
-            <span class="fs-6">
-                <i class="bi bi-cash-coin me-1"></i> Historial de Intereses
-            </span>
-            <span class="badge bg-light text-dark rounded-pill px-3">
-                {{ interestHistory|length }} registro(s)
-            </span>
-        </div>
-
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light text-muted small text-uppercase">
-                        <tr>
-                            <th class="ps-3">Periodo</th>
-                            <th class="text-end">Capital Base</th>
-                            <th class="text-end">Tasa</th>
-                            <th class="text-end pe-3">Interés</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for interest in interestHistory %}
-                            <tr>
-                                <td class="ps-3 font-monospace">
-                                    {{ interest.period }}
-                                </td>
-                                <td class="text-end">
-                                    ${{ interest.capitalBase|number_format(2, '.', ',') }}
-                                </td>
-                                <td class="text-end">
-                                    {{ interest.interestRate }}%
-                                </td>
-                                <td class="text-end text-success fw-bold pe-3">
-                                    ${{ interest.interestAmount|number_format(2, '.', ',') }}
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center py-5 text-muted">
-                                    <i class="bi bi-piggy-bank fs-2 d-block mb-2 text-secondary"></i>
-                                    No existen intereses generados aún.
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 

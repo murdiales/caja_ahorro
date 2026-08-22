@@ -29,29 +29,55 @@ final class TransactionController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
+        if (
+            !$this->isGranted('ROLE_ADMIN')
+            && !$this->isGranted('ROLE_TESORERO')
+        ) {
+            throw $this->createAccessDeniedException(
+                'No tiene permisos para realizar depósitos.'
+            );
+        }
+
         $selectedAccountId = $request->query->get('account_id');
 
         $reasons = [
-            'Aporte ordinario',
-            'Aporte extraordinario',
-            'Ingreso de intereses',
-            'Donación-otros',
-            'Amortización de préstamo-otros',
-            'Comisión-otros',
-            'Multa-otros',
-            'Cobro libreta-otros',
-            'Venta-otros',
-            'Ingreso corriente',
-            'Ingreso capital',
-            'Ingreso financiero',
-            'Actividades sociales-otros',
+            '101-Aporte ordinario',
+            '102-Aporte extraordinario',
+            '201-Ingreso de intereses',
+            '202-Donación',
+            '203-Multa',
+            '204-Cobro emisión libreta',
+            '205-Venta',
+            '301-Pago capital préstamo',
+            '206-Pago intereses',
+            '207-Actividades sociales',
         ];
 
-        $accounts = $accountRepository->findAll();
+        if (
+            $this->isGranted('ROLE_ADMIN')
+            || $this->isGranted('ROLE_TESORERO')
+        ) {
+
+            $accounts = $accountRepository->findAll();
+
+        } else {
+
+            $accounts = $accountRepository->findBy([
+                'user' => $this->getUser()
+            ]);
+
+        }
 
         if ($request->isMethod('POST')) {
             $accountId = $request->request->get('account_id');
             $amount = (float) $request->request->get('amount');
+
+            $transactionDateInput =
+                $request->request->get('transaction_date');
+
+            $transactionDate =
+                new \DateTime($transactionDateInput);
+
             $description = $request->request->get('description');
 
             $selectedAccount = $accountRepository->find($accountId);
@@ -60,7 +86,8 @@ final class TransactionController extends AbstractController
                 $this->addFlash('danger', 'La cuenta seleccionada no existe.');
             } else {
                 try {
-                    $transaction = $transactionService->deposit($selectedAccount, $amount, $description);
+                    $transaction = $transactionService->deposit($selectedAccount, $amount, $description,$transactionDate);
+
                     $this->addFlash('success', '¡Depósito realizado con éxito!');
                     return $this->redirectToRoute('app_transaction_receipt', ['id' => $transaction->getId()]);
                 } catch (Exception $e) {
@@ -84,6 +111,15 @@ final class TransactionController extends AbstractController
     ): Response {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
+        }
+
+        if (
+           !$this->isGranted('ROLE_ADMIN') 
+           && !$this->isGranted('ROLE_TESORERO')
+        ) {
+            throw $this->createAccessDeniedException(
+                'No tiene permisos para realizar retiros.'
+            );
         }
 
         $selectedAccountId = $request->query->get('account_id');

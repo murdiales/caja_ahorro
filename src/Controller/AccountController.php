@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Account;
 use App\Repository\TransactionRepository;
+use App\Repository\InterestAccrualRepository;
+use App\Repository\InterestRateConfigRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,10 +14,25 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AccountController extends AbstractController
 {
     #[Route('/{id}', name: 'app_account_show', methods: ['GET'])]
-    public function show(Account $account, TransactionRepository $transactionRepository): Response
+    public function show(Account $account, TransactionRepository $transactionRepository, InterestAccrualRepository $interestAccrualRepository, InterestRateConfigRepository $interestRateConfigRepository): Response
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
+        }
+
+        if (
+            !$this->isGranted('ROLE_ADMIN')
+            && !$this->isGranted('ROLE_TESORERO')    
+        ) {
+
+            if (
+                !$account->getUser()
+                || $account->getUser()->getId() !== $this->getUser()->getId()
+            ) {
+                throw $this->createAccessDeniedException(
+                    'No puede acceder a cuentas de otros socios.'
+                );
+            }
         }
 
         // Últimas 10 transacciones
@@ -25,9 +42,50 @@ final class AccountController extends AbstractController
             10
         );
 
+$accumulatedInterest = 0;
+
+foreach ($account->getInterestAccruals() as $interestAccrual) {
+
+    $accumulatedInterest +=
+        (float) $interestAccrual->getInterestAmount();
+}
+
+$availableBalance =
+    (float) $account->getCurrentBalance()
+    + $accumulatedInterest;
+
+$interestHistory = $account
+    ->getInterestAccruals()
+    ->toArray();
+
+$activeRate = $interestRateConfigRepository
+    ->findActiveRate(
+        new \DateTimeImmutable()
+    );
+
+$currentRate = $activeRate
+    ? (float) $activeRate->getRate()
+    : 0;
+
+$today = new \DateTimeImmutable();
+
+$nextCutoff = new \DateTimeImmutable(
+    $today->format('Y-m') . '-28'
+);
+
+if ((int)$today->format('d') >= 28) {
+    $nextCutoff = $nextCutoff->modify('+1 month');
+}
+
         return $this->render('account/show.html.twig', [
             'account' => $account,
             'recentTransactions' => $recentTransactions,
+            'accumulatedInterest' => $accumulatedInterest,
+            'availableBalance'   => $availableBalance, 
+            'interestHistory' => $interestHistory,
+            'currentRate' => $currentRate,
+            'nextCutoff' => $nextCutoff,
+
         ]);
     }
 
@@ -36,6 +94,21 @@ final class AccountController extends AbstractController
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
+        }
+
+        if (
+            !$this->isGranted('ROLE_ADMIN')
+            && !$this->isGranted('ROLE_TESORERO')
+        ) {
+
+            if (
+                !$account->getUser()
+                || $account->getUser()->getId() !== $this->getUser()->getId()
+            ) {
+                throw $this->createAccessDeniedException(
+                    'No puede acceder a cuentas de otros socios.'
+                );
+            }
         }
 
         // Filtro de los últimos 6 meses

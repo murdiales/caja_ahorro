@@ -84,6 +84,7 @@
                                            👁️ Ver Cuenta
                                         </a>
 
+                                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
                                         {# 2. Botón Depósito #}
                                         <a href="{{ path('app_transaction_deposit') }}?account_id={{ acc.id }}" 
                                            class="btn btn-success btn-sm shadow-sm px-2">
@@ -102,6 +103,8 @@
                                            title="Solicitar préstamo para esta cuenta">
                                            📋 Préstamo
                                         </a>
+                                        
+                                        {% endif %}
 
                                         {# 5. NUEVO BOTÓN: Estado de Cuenta e Intereses #}
                                         <a href="{{ path('app_report_statement', {id: acc.user.id}) }}" 

@@ -9,7 +9,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PublicPortalController extends AbstractController
 {
-    #[Route('/portal', name: 'app_public_portal')]
+    #[Route('/', name: 'app_public_portal')]
+    #[Route('/portal', name: 'app_public_portal_legacy')]
     public function index(SystemConfigRepository $repo): Response
     {
         $configs = [];

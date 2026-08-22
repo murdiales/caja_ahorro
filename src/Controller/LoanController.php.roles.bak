@@ -32,21 +32,7 @@ final class LoanController extends AbstractController
         }
 
         $selectedAccountId = $request->query->get('account_id');
-
-        if (
-            $this->isGranted('ROLE_ADMIN')
-            || $this->isGranted('ROLE_TESORERO')
-        ) {
-
-            $accounts = $accountRepository->findAll();
-
-        } else {
-
-            $accounts = $accountRepository->findBy([
-                'user' => $this->getUser()
-            ]);
-
-        }
+        $accounts = $accountRepository->findAll();
 
         if ($request->isMethod('POST')) {
             $accountId = $request->request->get('account_id');
@@ -62,31 +48,9 @@ final class LoanController extends AbstractController
 
             $account = $accountRepository->find($accountId);
 
-            if (
-                !$this->isGranted('ROLE_ADMIN')
-                && !$this->isGranted('ROLE_TESORERO')
-            ) {
-
-                if (
-                    !$account
-                    || !$account->getUser()
-                    || $account->getUser()->getId() !== $this->getUser()->getId()
-                ) {
-
-                   $this->addFlash(
-                        'danger',
-                        'No puede solicitar préstamos para cuentas de otros socios.'
-                    );
-
-                    return $this->redirectToRoute(
-                        'app_loan_request'
-                    );
-                }
-
             if (!$account) {
                 $this->addFlash('danger', 'La cuenta seleccionada no existe.');
-            } 
-
+            } else {
                 // Cálculo de cuota estimada amortizada
                 $monthlyInterest = ($interestRate / 100) / 12;
                 $monthlyFee = ($amount * $monthlyInterest) / (1 - pow(1 + $monthlyInterest, -$termMonths));
@@ -236,25 +200,7 @@ final class LoanController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        if (
-            $this->isGranted('ROLE_ADMIN')
-            || $this->isGranted('ROLE_TESORERO')
-        ) {
-
-            $loans = $loanRepository->findBy([], [
-                'requestedAt' => 'DESC'
-            ]);
-
-        } else {
-
-            $loans = array_filter(
-                $loanRepository->findBy([], ['requestedAt' => 'DESC']),
-                fn($loan) => $loan->getAccount()
-                    && $loan->getAccount()->getUser()
-                    && $loan->getAccount()->getUser()->getId() === $this->getUser()->getId()
-            );
-
-        }
+        $loans = $loanRepository->findBy([], ['requestedAt' => 'DESC']);
 
         return $this->render('loan/history.html.twig', [
             'loans' => $loans,

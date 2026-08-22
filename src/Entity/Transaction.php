@@ -32,6 +32,12 @@ class Transaction
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?\DateTimeInterface $transactionDate = null;
+
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?\DateTimeInterface $effectiveDate = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
@@ -101,6 +107,30 @@ class Transaction
     public function setCreatedAt(\DateTimeInterface $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getTransactionDate(): ?\DateTimeInterface
+    {
+        return $this->transactionDate;
+    }
+
+    public function setTransactionDate(?\DateTimeInterface $transactionDate): static
+    {
+        $this->transactionDate = $transactionDate;
+
+        return $this;
+    }
+
+    public function getEffectiveDate(): ?\DateTimeInterface
+    {
+        return $this->effectiveDate;
+    }
+
+    public function setEffectiveDate(?\DateTimeInterface $effectiveDate): static
+    {
+        $this->effectiveDate = $effectiveDate;
 
         return $this;
     }

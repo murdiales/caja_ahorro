@@ -35,15 +35,7 @@
                             </a>
                         </li>
 
-                        {# Documentos Institucionales #}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_document_index') }}">
-                                <i class="bi bi-file-earmark-pdf-fill"></i> Documentos Institucionales
-                            </a>
-                        </li>
-
                         {# Módulo 1: Administración de Cuentas #}
-                        {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-people-fill"></i> Adm. de Cuentas
@@ -57,10 +49,8 @@
                                 <li><a class="dropdown-item" href="/admin?crudAction=new&crudControllerFqcn=App%5CController%5CAdmin%5CAccountCrudController"><i class="bi bi-card-heading text-warning"></i> Crear Cuenta de Ahorro</a></li>
                             </ul>
                         </li>
-                        {% endif %}
 
                         {# Módulo 2: Transacciones #}
-                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-cash-stack"></i> Transacciones
@@ -71,10 +61,8 @@
                                 <li><a class="dropdown-item disabled" href="#"><i class="bi bi-arrow-left-right text-info"></i> Transferencia Inter-Cuentas</a></li>
                             </ul>
                         </li>
-                        {% endif %}
 
                         {# Módulo 3: Préstamos #}
-                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-bank"></i> Préstamos
@@ -87,10 +75,8 @@
                                 <li><a class="dropdown-item" href="{{ path('app_loan_history') }}"><i class="bi bi-journal-text"></i> Historial General</a></li>
                             </ul>
                         </li>
-                        {% endif %}
 
                         {# Módulo 4: Informes Financieros #}
-                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-file-earmark-bar-graph-fill"></i> Informes Financieros
@@ -103,10 +89,8 @@
                                 <li><a class="dropdown-item disabled" href="#"><i class="bi bi-pie-chart-fill"></i> Balance de Caja</a></li>
                             </ul>
                         </li>
-                        {% endif %}
 
                         {# Módulo 5: Gestión Documental e Historial de Correos #}
-                        {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-folder-symlink-fill"></i> Gestión Documental
@@ -121,16 +105,13 @@
                                 <li><a class="dropdown-item disabled" href="#"><i class="bi bi-archive-fill"></i> Archivo Digital de Socios</a></li>
                             </ul>
                         </li>
-                        {% endif %}
 
                         {# Opción directa para Configurar el Sitio Web #}
-                        {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_site_config_index') }}">
                                 <i class="bi bi-sliders"></i> Config. Portal Web
                             </a>
                         </li>
-                        {% endif %}
                     </ul>
 
                     {# Usuario activo y Logout #}

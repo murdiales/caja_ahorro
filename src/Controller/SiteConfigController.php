@@ -11,8 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/configuracion/sitio-web')]
+#[IsGranted('ROLE_ADMIN')]
 class SiteConfigController extends AbstractController
 {
     #[Route('/', name: 'app_site_config_index', methods: ['GET', 'POST'])]

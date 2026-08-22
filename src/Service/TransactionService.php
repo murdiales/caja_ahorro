@@ -16,8 +16,8 @@ class TransactionService
     /**
      * Registra un Depósito en la Cuenta
      */
-    public function deposit(Account $account, float $amount, ?string $description = null): Transaction
-    {
+    public function deposit(Account $account, float $amount, ?string $description = null, ?\DateTimeInterface $transactionDate = null): Transaction
+        {
         if ($amount <= 0) {
             throw new Exception('El monto a depositar debe ser mayor a cero.');
         }
@@ -27,11 +27,23 @@ class TransactionService
             $newBalance = (float) $account->getCurrentBalance() + $amount;
             $account->setCurrentBalance((string) $newBalance);
 
+            if (!$transactionDate) {$transactionDate = new \DateTime();
+            }
+
+            $effectiveDate = new \DateTime($transactionDate->format('Y-m') . '-28'
+            );
+
             $transaction = new Transaction();
             $transaction->setAccount($account);
             $transaction->setType('DEPOSIT');
             $transaction->setAmount((string) $amount);
             $transaction->setDescription($description ?? 'Depósito a cuenta');
+
+            $transaction->setTransactionDate($transactionDate
+            );
+
+            $transaction->setEffectiveDate($effectiveDate
+            );
 
             $this->entityManager->persist($transaction);
             $this->entityManager->flush();

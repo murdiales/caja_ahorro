@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\InterestRateConfig;
+use App\Entity\InterestAccrual;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<InterestRateConfig>
+ * @extends ServiceEntityRepository<InterestAccrual>
  */
-class InterestRateConfigRepository extends ServiceEntityRepository
+class InterestAccrualRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, InterestRateConfig::class);
+        parent::__construct($registry, InterestAccrual::class);
     }
 
     //    /**
-    //     * @return InterestRateConfig[] Returns an array of InterestRateConfig objects
+    //     * @return InterestAccrual[] Returns an array of InterestAccrual objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class InterestRateConfigRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?InterestRateConfig
+    //    public function findOneBySomeField($value): ?InterestAccrual
     //    {
     //        return $this->createQueryBuilder('i')
     //            ->andWhere('i.exampleField = :val')
@@ -40,21 +40,4 @@ class InterestRateConfigRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-
-public function findActiveRate(
-    \DateTimeInterface $date
-): ?InterestRateConfig
-{
-    return $this->createQueryBuilder('r')
-        ->andWhere('r.startDate <= :date')
-        ->andWhere(
-            '(r.endDate IS NULL OR r.endDate >= :date)'
-        )
-        ->setParameter('date', $date)
-        ->orderBy('r.startDate', 'DESC')
-        ->setMaxResults(1)
-        ->getQuery()
-        ->getOneOrNullResult();
-}
-
 }

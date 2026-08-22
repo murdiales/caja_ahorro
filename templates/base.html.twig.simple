@@ -32,35 +32,67 @@
                         <li class="nav-item">
                             <a class="nav-link active" href="{{ path('app_home') }}">
                                 <i class="bi bi-house-door-fill"></i> Ventanilla
-                            </a>
-                        </li>
 
-                        {# Documentos Institucionales #}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_document_index') }}">
-                                <i class="bi bi-file-earmark-pdf-fill"></i> Documentos Institucionales
-                            </a>
-                        </li>
-
-                        {# Módulo 1: Administración de Cuentas #}
                         {% if is_granted('ROLE_ADMIN') %}
+                        {# Módulo 1: Administración de Cuentas #}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-people-fill"></i> Adm. de Cuentas
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-menu-title dropdown-header fw-bold">Gestión de Usuarios</a></li>
-                                <li><a class="dropdown-item" href="{{ path('app_user_new') }}"><i class="bi bi-person-plus-fill text-success"></i> Crear Usuario</a></li>
-                                <li><a class="dropdown-item" href="{{ path('app_user_index') }}"><i class="bi bi-person-lines-fill text-primary"></i> Listar / Editar / Eliminar Usuarios</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-menu-title dropdown-header fw-bold">Gestión de Cuentas</a></li>
-                                <li><a class="dropdown-item" href="/admin?crudAction=new&crudControllerFqcn=App%5CController%5CAdmin%5CAccountCrudController"><i class="bi bi-card-heading text-warning"></i> Crear Cuenta de Ahorro</a></li>
-                            </ul>
-                        </li>
-                        {% endif %}
 
-                        {# Módulo 2: Transacciones #}
+    <a class="nav-link dropdown-toggle"
+       href="#"
+       role="button"
+       data-bs-toggle="dropdown">
+ 
+
+        <li>
+            <h6 class="dropdown-header">
+                Gestión de Usuarios
+            </h6>
+        </li>
+
+        <li>
+            <a class="dropdown-item"
+               href="{{ path('app_usercess"></i>
+                Crear Usuario
+            </a>
+        </li>
+
+        <li>
+             }}">
+                <i class="bi bi-person-lines-fill text-primary"></i>
+                Listar / Editar Usuarios
+            </a>
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <li>
+            <h6 class="dropdown-header">
+                Gestión de Cuentas
+            </h6>
+        </li>
+
+        <li>
+            /admin?crudAction=new&crudControllerFqcn=App%5CController%5CAdmin%5CAccountCrudController
+                <i class="bi bi-card-heading text-warning"></i>
+                Crear Cuenta de Ahorro
+            </a>
+        </li>
+
+        <li>
+             }}">
+                <i class="bi bi-percent text-warning"></i>
+                Tasas de Interés
+            </a>
+        </li>
+
+    </ul>
+
+</li>
+{% endif %}
+
+
                         {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
+                        {# Módulo 2: Transacciones #}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-cash-stack"></i> Transacciones
@@ -73,8 +105,8 @@
                         </li>
                         {% endif %}
 
-                        {# Módulo 3: Préstamos #}
                         {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
+                        {# Módulo 3: Préstamos #}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-bank"></i> Préstamos
@@ -89,8 +121,8 @@
                         </li>
                         {% endif %}
 
-                        {# Módulo 4: Informes Financieros #}
                         {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_TESORERO') %}
+                        {# Módulo 4: Informes Financieros #}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-file-earmark-bar-graph-fill"></i> Informes Financieros
@@ -105,8 +137,8 @@
                         </li>
                         {% endif %}
 
+                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_SECRETARIO') %}
                         {# Módulo 5: Gestión Documental e Historial de Correos #}
-                        {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-folder-symlink-fill"></i> Gestión Documental
@@ -123,15 +155,35 @@
                         </li>
                         {% endif %}
 
-                        {# Opción directa para Configurar el Sitio Web #}
+                        {# Inicio #}
+                        <li class="nav-item">
+                            {{ path('app_home') }}
+                                <i class="bi bi-house-door-fill"></i> Ventanilla
+                            </a>
+                        </li>
+
+                        {% if app.user %}
+                        <li class="nav-item">
+                             }}">
+                                <i class="bi bi-journal-text"></i> Documentos Institucionales
+                            </a>
+                        </li>
+                        {% endif %}
+
                         {% if is_granted('ROLE_ADMIN') %}
+                        {# Módulo 1: Administración de Cuentas #}
+                        <li class="nav-item dropdown">
+
+                        {% if is_granted('ROLE_ADMIN') %}
+                        {# Opción directa para Configurar el Sitio Web #}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_site_config_index') }}">
                                 <i class="bi bi-sliders"></i> Config. Portal Web
                             </a>
                         </li>
-                        {% endif %}
                     </ul>
+                    {% endif %}
+                    {% endif %}
 
                     {# Usuario activo y Logout #}
                     <div class="d-flex align-items-center gap-3">
