@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+Editar Configuración Financiera
+{% endblock %}
+
+{% block body %}
+
+<div class="container my-4">
+
+    <h2 class="fw-bold mb-4">
+        ✏️ Editar Configuración Financiera
+    </h2>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Día de Corte
+                    </label>
+
+                    <input
+                        type="number"
+                        name="interest_cutoff_day"
+                        class="form-control"
+                        value="{{ configs.interest_cutoff_day }}"
+                    >
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Regla de Elegibilidad
+                    </label>
+
+                    <select
+                        class="form-select"
+                        name="interest_eligibility_rule"
+                    >
+                        <option value="PREVIOUS_MONTH"
+                            {% if configs.interest_eligibility_rule == 'PREVIOUS_MONTH' %}
+                                selected
+                            {% endif %}
+                        >
+                            Capital del Mes Anterior
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Generación Automática
+                    </label>
+
+                    <select
+                        class="form-select"
+                        name="interest_auto_generation">
+
+                        <option value="1"
+                            {% if configs.interest_auto_generation == '1' %}
+                                selected
+                            {% endif %}
+                        >
+                            Sí
+                        </option>
+
+                        <option value="0"
+                            {% if configs.interest_auto_generation == '0' %}
+                                selected
+                            {% endif %}
+                        >
+                            No
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-success">
+
+                    Guardar Configuración
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+

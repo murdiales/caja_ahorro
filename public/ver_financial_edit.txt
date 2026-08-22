@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+Editar Configuración Financiera
+{% endblock %}
+
+{% block body %}
+
+<div class="container my-4">
+
+    <h2 class="fw-bold mb-4">
+        ✏ Editar Configuración Financiera
+    </h2>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <form>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Día de Corte
+                    </label>
+
+                    <input
+                        type="number"
+                        class="form-control"
+                        value="{{ configs.interest_cutoff_day }}"
+                    >
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Regla de Elegibilidad
+                    </label>
+
+                    <select class="form-select">
+
+                        <option selected>
+                            PREVIOUS_MONTH
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Generación Automática
+                    </label>
+
+                    <select class="form-select">
+
+                        <option
+                            {% if configs.interest_auto_generation == '1' %}
+                                selected
+                            {% endif %}
+                        >
+                            Sí
+                        </option>
+
+                        <option>
+                            No
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-success">
+
+                    Guardar Configuración
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
