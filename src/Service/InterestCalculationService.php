@@ -6,17 +6,19 @@ use App\Entity\Account;
 use App\Entity\InterestAccrual;
 use App\Repository\InterestAccrualRepository;
 use App\Repository\InterestRateConfigRepository;
+use App\Repository\TransactionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class InterestCalculationService
 {
-   
-public function __construct(
-    private EntityManagerInterface $entityManager,
-    private InterestAccrualRepository $interestAccrualRepository,
-    private InterestRateConfigRepository $interestRateConfigRepository
-) {
-}
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private InterestAccrualRepository $interestAccrualRepository,
+        private InterestRateConfigRepository $interestRateConfigRepository,
+        private TransactionRepository $transactionRepository
+    ) {
+    }
+
     public function generateMonthlyInterest(
         Account $account,
         string $period
@@ -32,22 +34,28 @@ public function __construct(
             return null;
         }
 
-        $capitalBase = (float) $account->getCurrentBalance();
+        $fechaCorte = new \DateTimeImmutable(
+            date('Y-m-t', strtotime('last month'))
+        );
+
+        $capitalBase = $this->transactionRepository
+            ->getCapitalElegibleHastaFecha(
+                $account,
+                $fechaCorte
+            );
 
         if ($capitalBase <= 0) {
             return null;
         }
 
-$config =
-    $this->interestRateConfigRepository
-         ->findActiveRate(
-             new \DateTimeImmutable()
-         );
+        $config = $this->interestRateConfigRepository
+            ->findActiveRate(
+                new \DateTimeImmutable()
+            );
 
-$interestRate =
-    $config
-        ? (float)$config->getRate()
-        : 1.00;
+        $interestRate = $config
+            ? (float) $config->getRate()
+            : 1.00;
 
         $interestAmount = round(
             $capitalBase * ($interestRate / 100),

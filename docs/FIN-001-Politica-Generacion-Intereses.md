@@ -103,3 +103,23 @@ No genera interés:
 
 Genera interés:
 28/10/2026
+
+
+## Tipo de Interés
+
+La Caja de Ahorro utiliza interés simple.
+
+Los intereses generados no forman parte del capital elegible.
+
+Los intereses acreditados no generan nuevos intereses.
+
+Capital Elegible:
+
+Depósitos
+(-) Retiros
+
+No incluye:
+
+Intereses acumulados
+Intereses acreditados
+Bonificaciones

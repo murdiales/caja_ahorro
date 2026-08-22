@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Account;
 use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,27 @@ class TransactionRepository extends ServiceEntityRepository
         parent::__construct($registry, Transaction::class);
     }
 
-//    /**
-//     * @return Transaction[] Returns an array of Transaction objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getCapitalElegibleHastaFecha(
+        Account $account,
+        \DateTimeInterface $fechaCorte
+    ): float {
+        $resultado = $this->createQueryBuilder('t')
+            ->select('SUM(
+                CASE
+                    WHEN t.type = :deposito THEN t.amount
+                    WHEN t.type = :retiro THEN -t.amount
+                    ELSE 0
+                END
+            ) AS capital')
+            ->andWhere('t.account = :account')
+            ->andWhere('t.transactionDate <= :fecha')
+            ->setParameter('account', $account)
+            ->setParameter('fecha', $fechaCorte)
+            ->setParameter('deposito', 'DEPOSIT')
+            ->setParameter('retiro', 'WITHDRAWAL')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-//    public function findOneBySomeField($value): ?Transaction
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return (float) ($resultado ?? 0);
+    }
 }
