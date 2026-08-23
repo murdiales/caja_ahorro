@@ -32,23 +32,6 @@ class GenerateInterestCommand extends Command
         $period = $this->financialPeriodService
             ->getCurrentPeriod();
 
-        $cutoffDay = $this->financialPeriodService
-            ->getCutoffDay();
-
-        $currentDay = (int) date('d');
-
-        if ($currentDay < $cutoffDay) {
-
-            $output->writeln(
-                sprintf(
-                    'Aún no se alcanza el día de corte (%d).',
-                    $cutoffDay
-                )
-            );
-
-            return Command::SUCCESS;
-        }
-
         $output->writeln(
             sprintf(
                 'Procesando período financiero: %s',
