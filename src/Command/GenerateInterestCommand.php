@@ -2,9 +2,11 @@
 
 namespace App\Command;
 
+use App\Entity\InterestGenerationLog;
 use App\Repository\AccountRepository;
 use App\Service\FinancialPeriodService;
 use App\Service\InterestCalculationService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,7 +21,8 @@ class GenerateInterestCommand extends Command
     public function __construct(
         private AccountRepository $accountRepository,
         private InterestCalculationService $interestCalculationService,
-        private FinancialPeriodService $financialPeriodService
+        private FinancialPeriodService $financialPeriodService,
+        private EntityManagerInterface $entityManager
     ) {
         parent::__construct();
     }
@@ -45,6 +48,25 @@ class GenerateInterestCommand extends Command
                     $cutoffDay
                 )
             );
+
+            $log = new InterestGenerationLog();
+            $log->setPeriod($period);
+            $log->setExecutionDate(
+                new \DateTimeImmutable()
+            );
+            $log->setAccountsProcessed(0);
+            $log->setInterestsGenerated(0);
+            $log->setStatus('SKIPPED');
+            $log->setNotes(
+                sprintf(
+                    'Proceso omitido. Día actual: %d. Día de corte: %d.',
+                    $currentDay,
+                    $cutoffDay
+                )
+            );
+
+            $this->entityManager->persist($log);
+            $this->entityManager->flush();
 
             return Command::SUCCESS;
         }
@@ -80,6 +102,28 @@ class GenerateInterestCommand extends Command
                 $generated
             )
         );
+
+        $log = new InterestGenerationLog();
+        $log->setPeriod($period);
+        $log->setExecutionDate(
+            new \DateTimeImmutable()
+        );
+        $log->setAccountsProcessed(
+            count($accounts)
+        );
+        $log->setInterestsGenerated(
+            $generated
+        );
+        $log->setStatus('COMPLETED');
+        $log->setNotes(
+            sprintf(
+                'Proceso ejecutado correctamente. %d intereses generados.',
+                $generated
+            )
+        );
+
+        $this->entityManager->persist($log);
+        $this->entityManager->flush();
 
         return Command::SUCCESS;
     }

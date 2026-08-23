@@ -1,0 +1,111 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\InterestGenerationLogRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: InterestGenerationLogRepository::class)]
+class InterestGenerationLog
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $period = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $executionDate = null;
+
+    #[ORM\Column]
+    private ?int $accountsProcessed = null;
+
+    #[ORM\Column]
+    private ?int $interestsGenerated = null;
+
+    #[ORM\Column(length: 30)]
+    private ?string $status = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $notes = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getPeriod(): ?string
+    {
+        return $this->period;
+    }
+
+    public function setPeriod(string $period): static
+    {
+        $this->period = $period;
+
+        return $this;
+    }
+
+    public function getExecutionDate(): ?\DateTimeImmutable
+    {
+        return $this->executionDate;
+    }
+
+    public function setExecutionDate(\DateTimeImmutable $executionDate): static
+    {
+        $this->executionDate = $executionDate;
+
+        return $this;
+    }
+
+    public function getAccountsProcessed(): ?int
+    {
+        return $this->accountsProcessed;
+    }
+
+    public function setAccountsProcessed(int $accountsProcessed): static
+    {
+        $this->accountsProcessed = $accountsProcessed;
+
+        return $this;
+    }
+
+    public function getInterestsGenerated(): ?int
+    {
+        return $this->interestsGenerated;
+    }
+
+    public function setInterestsGenerated(int $interestsGenerated): static
+    {
+        $this->interestsGenerated = $interestsGenerated;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): static
+    {
+        $this->notes = $notes;
+
+        return $this;
+    }
+}
