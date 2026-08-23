@@ -29,6 +29,13 @@ class GenerateInterestCommand extends Command
 
         $period = date('Y-m');
 
+        $output->writeln(
+            sprintf(
+                'Procesando período: %s',
+                $period
+            )
+        );
+
         $accounts = $this->accountRepository->findAll();
 
         $generated = 0;

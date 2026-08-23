@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Repository\AccountRepository;
+use App\Repository\SystemConfigRepository;
 use App\Service\InterestCalculationService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +18,8 @@ class GenerateInterestCommand extends Command
 {
     public function __construct(
         private AccountRepository $accountRepository,
-        private InterestCalculationService $interestCalculationService
+        private InterestCalculationService $interestCalculationService,
+        private SystemConfigRepository $systemConfigRepository
     ) {
         parent::__construct();
     }
@@ -27,11 +29,24 @@ class GenerateInterestCommand extends Command
         OutputInterface $output
     ): int {
 
+        $autoGeneration = $this->systemConfigRepository
+            ->findOneBy([
+                'configKey' => 'interest_auto_generation'
+            ]);
+
+        if (!$autoGeneration || $autoGeneration->getConfigValue() !== '1') {
+            $output->writeln(
+                'La generación automática de intereses está deshabilitada.'
+            );
+
+            return Command::SUCCESS;
+        }
+
         $period = date('Y-m');
 
         $output->writeln(
             sprintf(
-                'Procesando período: %s',
+                'Procesando período financiero: %s',
                 $period
             )
         );
