@@ -7,6 +7,7 @@ use App\Entity\InterestAccrual;
 use App\Repository\InterestAccrualRepository;
 use App\Repository\InterestRateConfigRepository;
 use App\Repository\TransactionRepository;
+use App\Service\FinancialPeriodService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class InterestCalculationService
@@ -15,7 +16,8 @@ class InterestCalculationService
         private EntityManagerInterface $entityManager,
         private InterestAccrualRepository $interestAccrualRepository,
         private InterestRateConfigRepository $interestRateConfigRepository,
-        private TransactionRepository $transactionRepository
+        private TransactionRepository $transactionRepository,
+        private FinancialPeriodService $financialPeriodService
     ) {
     }
 
@@ -34,9 +36,8 @@ class InterestCalculationService
             return null;
         }
 
-        $fechaCorte = new \DateTimeImmutable(
-            date('Y-m-t', strtotime('last month'))
-        );
+        $fechaCorte = $this->financialPeriodService
+            ->getEligibilityDate();
 
         $capitalBase = $this->transactionRepository
             ->getCapitalElegibleHastaFecha(
