@@ -42,13 +42,13 @@ class GenerateInterestCommand extends Command
 
         if ($currentDay < $cutoffDay) {
 
-            $output->writeln(
-                sprintf(
-                    'Aún no se alcanza el día de corte (%d).',
-                    $cutoffDay
-                )
-            );
-
+$output->writeln(
+    sprintf(
+        '[%s] Aún no se alcanza el día de corte (%d).',
+        date('Y-m-d H:i:s'),
+        $cutoffDay
+    )
+);
             $log = new InterestGenerationLog();
             $log->setPeriod($period);
             $log->setExecutionDate(
