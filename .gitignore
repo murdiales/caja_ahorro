@@ -19,3 +19,5 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 caja_ahorro_roles_ok.tar.gz
+error.log
+error.txt
