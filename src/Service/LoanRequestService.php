@@ -21,15 +21,14 @@ class LoanRequestService
         float $amount,
         int $termMonths,
         float $interestRate,
-        \DateTime $firstDueDate
+        \DateTimeImmutable $firstDueDate
     ): Loan {
 
-        $simulation = $this->amortizationService
-            ->generateSchedule(
-                $amount,
-                $termMonths,
-                $interestRate
-            );
+        $simulation = $this->amortizationService->generateSchedule(
+            $amount,
+            $termMonths,
+            $interestRate
+        );
 
         $loan = new Loan();
 
@@ -46,12 +45,7 @@ class LoanRequestService
         $loan->setTermMonths($termMonths);
 
         $loan->setInterestRate(
-            number_format(
-                $interestRate,
-                2,
-                '.',
-                ''
-            )
+            number_format($interestRate, 2, '.', '')
         );
 
         $loan->setTotalInterest(
@@ -82,18 +76,17 @@ class LoanRequestService
             new \DateTimeImmutable()
         );
 
-        $this->entityManager->persist($loan);
+        $loan->setUpdatedAt(
+            new \DateTimeImmutable()
+        );
 
+        $this->entityManager->persist($loan);
         $this->entityManager->flush();
 
         $this->installmentGenerator->generate(
             $loan,
             $firstDueDate
         );
-dd(
-    'Préstamo creado',
-    $loan->getId()
-);
 
         return $loan;
     }
