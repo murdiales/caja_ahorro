@@ -16,53 +16,69 @@ class LoanCreateController extends AbstractController
         Request $request,
         AccountRepository $accountRepository,
         LoanRequestService $loanRequestService
-    ): Response
-    {
-        try {
+    ): Response {
 
-            $account = $accountRepository->find(1);
+        $amount = (float) $request->request->get('amount');
+        $termMonths = (int) $request->request->get('termMonths');
+        $interestRate = (float) $request->request->get('interestRate');
+        $firstDueDateRaw = $request->request->get('firstDueDate');
 
-            if (!$account) {
+        if (
+            !$amount ||
+            !$termMonths ||
+            !$interestRate ||
+            !$firstDueDateRaw
+        ) {
 
-                return new Response(
-                    '<h1>Error</h1><pre>No existe Account ID 1.</pre>'
-                );
-            }
-
-            $loan = $loanRequestService->create(
-                $account,
-                (float) $request->request->get('amount'),
-                (int) $request->request->get('termMonths'),
-                (float) $request->request->get('interestRate'),
-                new \DateTimeImmutable(
-                    $request->request->get('firstDueDate')
-                )
+            $this->addFlash(
+                'danger',
+                'Todos los campos son obligatorios para procesar la solicitud.'
             );
 
-            dd($loan);
-
-        } catch (\Throwable $e) {
-
-            return new Response(
-                '<h1>Error al crear préstamo</h1>'
-                . '<hr>'
-                . '<h3>Mensaje</h3>'
-                . '<pre>'
-                . $e->getMessage()
-                . '</pre>'
-                . '<h3>Archivo</h3>'
-                . '<pre>'
-                . $e->getFile()
-                . '</pre>'
-                . '<h3>Línea</h3>'
-                . '<pre>'
-                . $e->getLine()
-                . '</pre>'
-                . '<h3>Trace</h3>'
-                . '<pre>'
-                . $e->getTraceAsString()
-                . '</pre>'
+            return $this->redirectToRoute(
+                'loan_simulator'
             );
         }
+
+        $firstDueDate = new \DateTimeImmutable(
+            $firstDueDateRaw
+        );
+
+        $account = $accountRepository->findOneBy([]);
+
+        if (!$account) {
+
+            $this->addFlash(
+                'danger',
+                'No se encontró una cuenta asociada para registrar la solicitud.'
+            );
+
+            return $this->redirectToRoute(
+                'loan_simulator'
+            );
+        }
+
+        $loan = $loanRequestService->create(
+            $account,
+            $amount,
+            $termMonths,
+            $interestRate,
+            $firstDueDate
+        );
+
+        $this->addFlash(
+            'success',
+            sprintf(
+                'Solicitud de préstamo %s registrada correctamente.',
+                $loan->getNumber()
+            )
+        );
+
+        return $this->redirectToRoute(
+            'loan_detail',
+            [
+                'id' => $loan->getId()
+            ]
+        );
     }
 }
