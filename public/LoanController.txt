@@ -1,0 +1,280 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Loan;
+use App\Repository\AccountRepository;
+use App\Repository\LoanRepository;
+use App\Service\TransactionService;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/loan')]
+final class LoanController extends AbstractController
+{
+    /**
+     * 1. FORMULARIO DE SOLICITUD DE PRÉSTAMO
+     */
+    #[Route('/request', name: 'app_loan_request', methods: ['GET', 'POST'])]
+    public function requestLoan(
+        Request $request,
+        AccountRepository $accountRepository,
+        EntityManagerInterface $em
+    ): Response {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $selectedAccountId = $request->query->get('account_id');
+
+        if (
+            $this->isGranted('ROLE_ADMIN')
+            || $this->isGranted('ROLE_TESORERO')
+        ) {
+
+            $accounts = $accountRepository->findAll();
+
+        } else {
+
+            $accounts = $accountRepository->findBy([
+                'user' => $this->getUser()
+            ]);
+
+        }
+
+        if ($request->isMethod('POST')) {
+            $accountId = $request->request->get('account_id');
+            $amount = (float) $request->request->get('amount');
+            $termMonths = (int) $request->request->get('term_months');
+            $interestRate = 12.0; // Tasa de interés anual fija (12%)
+
+            // Validación del plazo (Máximo 60 meses)
+            if ($termMonths < 1 || $termMonths > 60) {
+                $this->addFlash('danger', 'El plazo debe ser entre 1 y 60 meses.');
+                return $this->redirectToRoute('app_loan_request', ['account_id' => $accountId]);
+            }
+
+            $account = $accountRepository->find($accountId);
+
+            if (
+                !$this->isGranted('ROLE_ADMIN')
+                && !$this->isGranted('ROLE_TESORERO')
+            ) {
+
+                if (
+                    !$account
+                    || !$account->getUser()
+                    || $account->getUser()->getId() !== $this->getUser()->getId()
+                ) {
+
+                   $this->addFlash(
+                        'danger',
+                        'No puede solicitar préstamos para cuentas de otros socios.'
+                    );
+
+                    return $this->redirectToRoute(
+                        'app_loan_request'
+                    );
+                }
+
+            if (!$account) {
+                $this->addFlash('danger', 'La cuenta seleccionada no existe.');
+            } 
+
+                // Cálculo de cuota estimada amortizada
+                $monthlyInterest = ($interestRate / 100) / 12;
+                $monthlyFee = ($amount * $monthlyInterest) / (1 - pow(1 + $monthlyInterest, -$termMonths));
+
+                $loan = new Loan();
+                $loan->setAccount($account);
+                $loan->setAmount((string) $amount);
+                $loan->setTermMonths($termMonths);
+                $loan->setInterestRate((string) $interestRate);
+                $loan->setMonthlyFee((string) round($monthlyFee, 2));
+                $loan->setStatus('PENDING');
+                $loan->setRequestedAt(new \DateTime());
+
+                $em->persist($loan);
+                $em->flush();
+
+                $this->addFlash('success', '¡Solicitud de préstamo registrada con éxito! En espera de aprobación.');
+                return $this->redirectToRoute('app_loan_pending');
+            }
+        }
+
+        return $this->render('loan/request.html.twig', [
+            'accounts' => $accounts,
+            'selectedAccountId' => $selectedAccountId,
+        ]);
+    }
+
+    /**
+     * 2. BANDEJA DE SOLICITUDES Y APROBACIONES
+     */
+    #[Route('/pending', name: 'app_loan_pending', methods: ['GET'])]
+    public function pendingLoans(LoanRepository $loanRepository): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $pendingLoans = $loanRepository->findBy(['status' => 'PENDING'], ['requestedAt' => 'DESC']);
+
+        return $this->render('loan/pending.html.twig', [
+            'loans' => $pendingLoans,
+        ]);
+    }
+
+    /**
+     * ACCIÓN DE APROBAR PRÉSTAMO Y ENVIAR NOTIFICACIÓN POR CORREO
+     */
+    #[Route('/{id}/approve', name: 'app_loan_approve', methods: ['POST'])]
+    public function approveLoan(
+        Loan $loan,
+        TransactionService $transactionService,
+        EntityManagerInterface $em,
+        MailerInterface $mailer
+    ): Response {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if ($loan->getStatus() !== 'PENDING') {
+            $this->addFlash('warning', 'Esta solicitud ya fue procesada.');
+            return $this->redirectToRoute('app_loan_pending');
+        }
+
+        try {
+            // 1. Cambiar estado a Aprobado
+            $loan->setStatus('APPROVED');
+            $loan->setApprovedAt(new \DateTime());
+            $em->flush();
+
+            // 2. Acreditar monto del préstamo a la cuenta del socio
+            $transactionService->deposit(
+                $loan->getAccount(),
+                (float) $loan->getAmount(),
+                sprintf('Desembolso por Aprobación de Préstamo #%d', $loan->getId())
+            );
+
+            // 3. Enviar correo de aprobación
+            $user = $loan->getAccount()->getUser();
+            $email = (new Email())
+                ->from('no-reply@caja-ahorro.com')
+                ->to($user->getEmail())
+                ->subject(sprintf('¡Su Préstamo #%d ha sido APROBADO!', $loan->getId()))
+                ->html($this->renderView('email/loan_approved.html.twig', [
+                    'loan' => $loan,
+                ]));
+
+            $mailer->send($email);
+
+            $this->addFlash('success', sprintf('¡Préstamo #%d aprobado, acreditado y notificado por correo!', $loan->getId()));
+        } catch (Exception $e) {
+            $this->addFlash('danger', 'Error al procesar la aprobación: ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_loan_pending');
+    }
+
+    /**
+     * ACCIÓN DE RECHAZAR PRÉSTAMO Y ENVIAR NOTIFICACIÓN POR CORREO
+     */
+    #[Route('/{id}/reject', name: 'app_loan_reject', methods: ['POST'])]
+    public function rejectLoan(
+        Loan $loan,
+        EntityManagerInterface $em,
+        MailerInterface $mailer
+    ): Response {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if ($loan->getStatus() !== 'PENDING') {
+            $this->addFlash('warning', 'Esta solicitud ya fue procesada.');
+            return $this->redirectToRoute('app_loan_pending');
+        }
+
+        try {
+            // 1. Cambiar estado a Rechazado
+            $loan->setStatus('REJECTED');
+            $em->flush();
+
+            // 2. Enviar correo de notificación de rechazo
+            $user = $loan->getAccount()->getUser();
+            $email = (new Email())
+                ->from('no-reply@caja-ahorro.com')
+                ->to($user->getEmail())
+                ->subject(sprintf('Notificación sobre su Solicitud de Préstamo #%d', $loan->getId()))
+                ->html($this->renderView('email/loan_rejected.html.twig', [
+                    'loan' => $loan,
+                ]));
+
+            $mailer->send($email);
+
+            $this->addFlash('info', sprintf('La solicitud de préstamo #%d ha sido rechazada y notificada.', $loan->getId()));
+        } catch (Exception $e) {
+            $this->addFlash('danger', 'Error al procesar el rechazo: ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_loan_pending');
+    }
+
+    /**
+     * 3. HISTORIAL GENERAL DE PRÉSTAMOS
+     */
+    #[Route('/history', name: 'app_loan_history', methods: ['GET'])]
+    public function history(LoanRepository $loanRepository): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if (
+            $this->isGranted('ROLE_ADMIN')
+            || $this->isGranted('ROLE_TESORERO')
+        ) {
+
+            $loans = $loanRepository->findBy([], [
+                'requestedAt' => 'DESC'
+            ]);
+
+        } else {
+
+            $loans = array_filter(
+                $loanRepository->findBy([], ['requestedAt' => 'DESC']),
+                fn($loan) => $loan->getAccount()
+                    && $loan->getAccount()->getUser()
+                    && $loan->getAccount()->getUser()->getId() === $this->getUser()->getId()
+            );
+
+        }
+
+        return $this->render('loan/history.html.twig', [
+            'loans' => $loans,
+        ]);
+    }
+
+    /**
+     * 4. CONTROL Y TABLA DE PAGOS
+     */
+    #[Route('/payments', name: 'app_loan_payments', methods: ['GET'])]
+    public function payments(LoanRepository $loanRepository): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $approvedLoans = $loanRepository->findBy(['status' => 'APPROVED'], ['approvedAt' => 'DESC']);
+
+        return $this->render('loan/payments.html.twig', [
+            'loans' => $approvedLoans,
+        ]);
+    }
+}

@@ -41,8 +41,20 @@ class Loan
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $approvalDate = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $approvedBy = null;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $disbursementDate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $rejectionDate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $rejectedBy = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $rejectionReason = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2)]
     private ?string $totalInterest = null;
@@ -171,6 +183,18 @@ class Loan
         return $this;
     }
 
+    public function getApprovedBy(): ?string
+    {
+        return $this->approvedBy;
+    }
+
+    public function setApprovedBy(?string $approvedBy): static
+    {
+        $this->approvedBy = $approvedBy;
+
+        return $this;
+    }
+
     public function getDisbursementDate(): ?\DateTimeImmutable
     {
         return $this->disbursementDate;
@@ -179,6 +203,42 @@ class Loan
     public function setDisbursementDate(?\DateTimeImmutable $disbursementDate): static
     {
         $this->disbursementDate = $disbursementDate;
+
+        return $this;
+    }
+
+    public function getRejectionDate(): ?\DateTimeImmutable
+    {
+        return $this->rejectionDate;
+    }
+
+    public function setRejectionDate(?\DateTimeImmutable $rejectionDate): static
+    {
+        $this->rejectionDate = $rejectionDate;
+
+        return $this;
+    }
+
+    public function getRejectedBy(): ?string
+    {
+        return $this->rejectedBy;
+    }
+
+    public function setRejectedBy(?string $rejectedBy): static
+    {
+        $this->rejectedBy = $rejectedBy;
+
+        return $this;
+    }
+
+    public function getRejectionReason(): ?string
+    {
+        return $this->rejectionReason;
+    }
+
+    public function setRejectionReason(?string $rejectionReason): static
+    {
+        $this->rejectionReason = $rejectionReason;
 
         return $this;
     }
@@ -264,7 +324,6 @@ class Loan
     public function removeInstallment(LoanInstallment $installment): static
     {
         if ($this->installments->removeElement($installment)) {
-            // set the owning side to null (unless already changed)
             if ($installment->getLoan() === $this) {
                 $installment->setLoan(null);
             }
