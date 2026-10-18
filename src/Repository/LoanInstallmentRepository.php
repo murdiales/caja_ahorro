@@ -16,28 +16,25 @@ class LoanInstallmentRepository extends ServiceEntityRepository
         parent::__construct($registry, LoanInstallment::class);
     }
 
-    //    /**
-    //     * @return LoanInstallment[] Returns an array of LoanInstallment objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('l.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Devuelve el total numérico de cuotas vencidas y no pagadas a la fecha actual.
+     */
+    public function getCuotasVencidas(): int
+    {
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->where('i.dueDate < :hoy')
+            ->andWhere('i.paidAt IS NULL')
+            ->setParameter('hoy', new \DateTimeImmutable())
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-    //    public function findOneBySomeField($value): ?LoanInstallment
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Devuelve el conteo total de todas las cuotas registradas en la base de datos.
+     */
+    public function getTotalCuotas(): int
+    {
+        return $this->count([]);
+    }
 }

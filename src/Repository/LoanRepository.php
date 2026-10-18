@@ -16,28 +16,34 @@ class LoanRepository extends ServiceEntityRepository
         parent::__construct($registry, Loan::class);
     }
 
-    //    /**
-    //     * @return Loan[] Returns an array of Loan objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('l.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getTotalLoanAmount(): float
+    {
+        $resultado = $this->createQueryBuilder('l')
+            ->select('SUM(l.amount)')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-    //    public function findOneBySomeField($value): ?Loan
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return (float) ($resultado ?? 0);
+    }
+
+    public function getEstadoPrestamos(): array
+    {
+        $activos = $this->count([
+            'status' => 'ACTIVE'
+        ]);
+
+        $cerrados = $this->count([
+            'status' => 'PAID'
+        ]);
+
+        $vencidos = $this->count([
+            'status' => 'OVERDUE'
+        ]);
+
+        return [
+            'activos'  => $activos,
+            'cerrados' => $cerrados,
+            'vencidos' => $vencidos,
+        ];
+    }
 }

@@ -1,0 +1,261 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Ejecutivo{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    <h2 class="mb-4 fw-bold text-dark">
+        <i class="bi bi-bar-chart-fill text-primary me-2"></i>
+        Dashboard Ejecutivo
+    </h2>
+
+    {# Tarjetas de Resumen KPI (Datos reales desde BD con Iconos Bootstrap) #}
+    <div class="row g-3 mb-4">
+        {# Card 1: Socios #}
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <h6 class="text-muted text-uppercase small fw-bold">
+                        <i class="bi bi-people-fill me-1"></i> Socios
+                    </h6>
+                    <h2 class="text-primary fw-bold mb-0">{{ totalSocios }}</h2>
+                </div>
+            </div>
+        </div>
+
+        {# Card 2: Ahorros #}
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <h6 class="text-muted text-uppercase small fw-bold">
+                        <i class="bi bi-piggy-bank-fill me-1"></i> Ahorros
+                    </h6>
+                    <h2 class="text-success fw-bold mb-0">
+                        ${{ totalAhorros|number_format(2, '.', ',') }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        {# Card 3: Depósitos #}
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <h6 class="text-muted text-uppercase small fw-bold">
+                        <i class="bi bi-cash-stack me-1"></i> Depósitos
+                    </h6>
+                    <h2 class="text-info fw-bold mb-0">
+                        ${{ totalDepositos|number_format(2, '.', ',') }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        {# Card 4: Monto Prestado #}
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <h6 class="text-muted text-uppercase small fw-bold">
+                        <i class="bi bi-bank me-1"></i> Monto Prestado
+                    </h6>
+                    <h2 class="text-warning fw-bold mb-0">
+                        ${{ montoPrestado|number_format(2, '.', ',') }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        {# Card 5: Cuotas Vencidas #}
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <h6 class="text-muted text-uppercase small fw-bold">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Cuotas Vencidas
+                    </h6>
+                    <h2 class="text-danger fw-bold mb-0">{{ cuotasVencidas }}</h2>
+                </div>
+            </div>
+        </div>
+
+        {# Card 6: Liquidez #}
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <h6 class="text-muted text-uppercase small fw-bold">
+                        <i class="bi bi-wallet2 me-1"></i> Liquidez
+                    </h6>
+                    <h2 class="
+                        {% if liquidez >= 0 %}
+                            text-success
+                        {% else %}
+                            text-danger
+                        {% endif %}
+                        fw-bold mb-0
+                    ">
+                        ${{ liquidez|number_format(2, '.', ',') }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        {# Card 7: Morosidad % #}
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <h6 class="text-muted text-uppercase small fw-bold">
+                        <i class="bi bi-percent me-1"></i> Morosidad %
+                    </h6>
+                    <h2 class="text-danger fw-bold mb-0">
+                        {{ morosidad|number_format(2, '.', ',') }}%
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Gráfico 1: Evolución Mensual #}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 fw-bold text-secondary">
+            <i class="bi bi-graph-up me-1"></i> Evolución Mensual
+        </div>
+        <div class="card-body">
+            <div style="height: 400px;">
+                <canvas id="evolucionMensual"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {# Gráficos Comparativos Secundarios #}
+    <div class="row g-4">
+        {# Gráfico 2: Depósitos vs Retiros #}
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white fw-bold text-secondary">
+                    <i class="bi bi-bar-chart me-1"></i> Depósitos vs Retiros
+                </div>
+                <div class="card-body">
+                    <div style="height:350px;">
+                        <canvas id="depositosRetiros"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Gráfico 3: Estado de Préstamos (Dona) #}
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white fw-bold text-secondary">
+                    <i class="bi bi-pie-chart-fill me-1"></i> Estado de Préstamos
+                </div>
+                <div class="card-body">
+                    <div style="height:350px;">
+                        <canvas id="estadoPrestamos"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Bloque de Alertas Gerenciales #}
+    <div class="card border-0 shadow-sm mt-4 mb-4">
+        <div class="card-header bg-white fw-bold text-dark">
+            <i class="bi bi-bell-fill text-danger me-1"></i> Alertas Gerenciales
+        </div>
+        <div class="card-body">
+            {% if alertas is empty %}
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check-circle-fill me-1"></i> No existen alertas críticas.
+                </div>
+            {% else %}
+                {% for alerta in alertas %}
+                    <div class="alert alert-warning mb-2">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ alerta }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Gráfico de Línea: Evolución Mensual (Datos estáticos)
+    const ctxEvolucion = document.getElementById('evolucionMensual');
+    new Chart(ctxEvolucion, {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Depósitos',
+                data: [5000, 7500, 11000, 9000, 14500, 18000],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.15)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // 2. Gráfico de Barras: Depósitos vs Retiros
+    const ctx2 = document.getElementById('depositosRetiros');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Depósitos', 'Retiros'],
+            datasets: [{
+                label: 'Monto ($)',
+                data: [
+                    {{ depositosGrafico|default(0) }},
+                    {{ retirosGrafico|default(0) }}
+                ],
+                backgroundColor: [
+                    '#198754',
+                    '#dc3545'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // 3. Gráfico de Dona: Estado de Préstamos
+    const ctx3 = document.getElementById('estadoPrestamos');
+    new Chart(ctx3, {
+        type: 'doughnut',
+        data: {
+            labels: ['Activos', 'Pagados', 'Vencidos'],
+            datasets: [{
+                data: [
+                    {{ estadoPrestamos.activos|default(0) }},
+                    {{ estadoPrestamos.cerrados|default(0) }},
+                    {{ estadoPrestamos.vencidos|default(0) }}
+                ],
+                backgroundColor: [
+                    '#198754',
+                    '#0d6efd',
+                    '#dc3545'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

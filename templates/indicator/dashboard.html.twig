@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Ejecutivo{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+
+    <h2 class="mb-4">
+        <i class="bi bi-bar-chart-fill"></i>
+        Dashboard Ejecutivo
+    </h2>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6>Socios</h6>
+                    <h2>248</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6>Ahorros</h6>
+                    <h2>$125.000</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6>Depósitos</h6>
+                    <h2>$83.000</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6>Préstamos</h6>
+                    <h2>$54.000</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header">
+            Evolución Mensual
+        </div>
+
+        <div class="card-body">
+            <canvas id="evolucionMensual" height="120"></canvas>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    new Chart(
+        document.getElementById('evolucionMensual'),
+        {
+            type: 'line',
+            data: {
+                labels: [
+                    'Ene',
+                    'Feb',
+                    'Mar',
+                    'Abr',
+                    'May',
+                    'Jun'
+                ],
+                datasets: [{
+                    label: 'Depósitos',
+                    data: [
+                        5000,
+                        8500,
+                        12000,
+                        9000,
+                        14000,
+                        18000
+                    ],
+                    borderColor: '#0d6efd',
+                    tension: 0.4
+                }]
+            }
+        }
+    );
+
+});
+</script>
+
+{% endblock %}
