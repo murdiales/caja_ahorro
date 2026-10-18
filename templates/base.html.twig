@@ -15,17 +15,10 @@
 </head>
 <body class="bg-light">
 
-<div class="text-white text-center fw-bold py-1
-    {% if app.environment == 'prod' %}
-        bg-success
-    {% else %}
-        bg-danger
-    {% endif %}
-">
-    ENTORNO {{ app.environment|upper }}
+
+<div style="background:#dc3545;color:#fff;text-align:center;font-weight:bold;padding:4px;">
+    ENTORNO DEV
 </div>
-
-
 
 {# El Menú de Navegación SÓLO se muestra si el usuario inició sesión #}
 {% if app.user %}
