@@ -124,7 +124,7 @@ final class LoanController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $pendingLoans = $loanRepository->findBy(['status' => 'PENDING'], ['requestedAt' => 'DESC']);
+        $pendingLoans = $loanRepository->findBy(['status' => 'PENDING'], ['requestDate' => 'DESC']);
 
         return $this->render('loan/pending.html.twig', [
             'loans' => $pendingLoans,
@@ -242,13 +242,13 @@ final class LoanController extends AbstractController
         ) {
 
             $loans = $loanRepository->findBy([], [
-                'requestedAt' => 'DESC'
+                'requestDate' => 'DESC'
             ]);
 
         } else {
 
             $loans = array_filter(
-                $loanRepository->findBy([], ['requestedAt' => 'DESC']),
+                $loanRepository->findBy([], ['requestDate' => 'DESC']),
                 fn($loan) => $loan->getAccount()
                     && $loan->getAccount()->getUser()
                     && $loan->getAccount()->getUser()->getId() === $this->getUser()->getId()
