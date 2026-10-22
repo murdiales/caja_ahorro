@@ -35,15 +35,15 @@
                                 <td class="fw-bold">${{ loan.amount|number_format(2, '.', ',') }}</td>
                                 <td>{{ loan.termMonths }} Meses</td>
                                 <td>
-                                    {% if loan.status == 'PENDING' %}
+                                    {% if loan.status == 'SOLICITADO' %}
                                         <span class="badge bg-warning text-dark">PENDIENTE</span>
-                                    {% elseif loan.status == 'APPROVED' %}
+                                    {% elseif loan.status == 'APROBADO' %}
                                         <span class="badge bg-success">APROBADO</span>
                                     {% else %}
                                         <span class="badge bg-secondary">{{ loan.status }}</span>
                                     {% endif %}
                                 </td>
-                                <td class="small">{{ loan.requestedAt|date('d/m/Y H:i') }}</td>
+                                <td class="small">{{ loan.requestDate|date('d/m/Y H:i') }}</td>
                             </tr>
                         {% else %}
                             <tr>

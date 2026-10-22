@@ -34,7 +34,7 @@ class TestLoanGeneratorController extends AbstractController
         $loan->setAmount('1000.00');
         $loan->setTermMonths(10);
         $loan->setInterestRate('1.00');
-        $loan->setStatus('ACTIVE');
+        $loan->setStatus('ACTIVO');
 
         $loan->setRequestDate(
             new \DateTimeImmutable()

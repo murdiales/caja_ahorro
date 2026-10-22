@@ -38,7 +38,7 @@
                                 <td class="text-success fw-bold">${{ loan.amount|number_format(2, '.', ',') }}</td>
                                 <td>{{ loan.termMonths }} Meses</td>
                                 <td>${{ loan.monthlyFee|number_format(2, '.', ',') }}/mes</td>
-                                <td class="small">{{ loan.requestedAt|date('d/m/Y H:i') }}</td>
+                                <td class="small">{{ loan.requestDate|date('d/m/Y H:i') }}</td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
                                         {# Botón Aprobar #}

@@ -28,7 +28,7 @@ class Account
     private ?string $currentBalance = '0.00';
 
     #[ORM\Column(length: 20)]
-    private ?string $status = 'ACTIVE';
+    private ?string $status = 'ACTIVO';
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $openedAt = null;

@@ -78,9 +78,9 @@
                 <div class="card-body text-center py-3">
                     <span class="text-muted small text-uppercase fw-bold">Estado</span>
                     <div class="mt-2">
-                        {% if loan.status in ['SOLICITADO', 'PENDING'] %}
+                        {% if loan.status in ['SOLICITADO', 'SOLICITADO'] %}
                             <span class="badge bg-warning text-dark px-3 py-2 fs-6">SOLICITADO</span>
-                        {% elseif loan.status in ['APROBADO', 'ACTIVE', 'ACTIVO'] %}
+                        {% elseif loan.status in ['APROBADO', 'ACTIVO', 'ACTIVO'] %}
                             <span class="badge bg-success px-3 py-2 fs-6">APROBADO</span>
                         {% elseif loan.status == 'RECHAZADO' %}
                             <span class="badge bg-danger px-3 py-2 fs-6">RECHAZADO</span>
@@ -190,11 +190,11 @@
                             <td class="text-end fw-bold text-primary">${{ installment.installmentAmount|number_format(2, '.', ',') }}</td>
                             <td class="text-end">${{ installment.closingBalance|number_format(2, '.', ',') }}</td>
                             <td class="text-center">
-                                {% if installment.status in ['PENDIENTE', 'PENDING'] %}
+                                {% if installment.status in ['PENDIENTE', 'SOLICITADO'] %}
                                     <span class="badge bg-warning text-dark">PENDIENTE</span>
-                                {% elseif installment.status in ['PAGADA', 'PAID'] %}
+                                {% elseif installment.status in ['PAGADA', 'PAGADO'] %}
                                     <span class="badge bg-success">PAGADA</span>
-                                {% elseif installment.status in ['VENCIDA', 'OVERDUE'] %}
+                                {% elseif installment.status in ['VENCIDA', 'VENCIDO'] %}
                                     <span class="badge bg-danger">VENCIDA</span>
                                 {% else %}
                                     <span class="badge bg-secondary">{{ installment.status }}</span>

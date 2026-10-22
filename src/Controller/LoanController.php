@@ -96,9 +96,8 @@ final class LoanController extends AbstractController
                 $loan->setAmount((string) $amount);
                 $loan->setTermMonths($termMonths);
                 $loan->setInterestRate((string) $interestRate);
-                $loan->setMonthlyFee((string) round($monthlyFee, 2));
-                $loan->setStatus('PENDING');
-                $loan->setRequestedAt(new \DateTime());
+                $loan->setStatus('SOLICITADO');
+                $loan->setRequestDate(new \DateTimeImmutable());
 
                 $em->persist($loan);
                 $em->flush();
@@ -124,7 +123,7 @@ final class LoanController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $pendingLoans = $loanRepository->findBy(['status' => 'PENDING'], ['requestDate' => 'DESC']);
+        $pendingLoans = $loanRepository->findBy(['status' => 'SOLICITADO'], ['requestDate' => 'DESC']);
 
         return $this->render('loan/pending.html.twig', [
             'loans' => $pendingLoans,
@@ -145,15 +144,15 @@ final class LoanController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        if ($loan->getStatus() !== 'PENDING') {
+        if ($loan->getStatus() !== 'SOLICITADO') {
             $this->addFlash('warning', 'Esta solicitud ya fue procesada.');
             return $this->redirectToRoute('app_loan_pending');
         }
 
         try {
             // 1. Cambiar estado a Aprobado
-            $loan->setStatus('APPROVED');
-            $loan->setApprovedAt(new \DateTime());
+            $loan->setStatus('APROBADO');
+            $loan->setApprovalDate(new \DateTimeImmutable());
             $em->flush();
 
             // 2. Acreditar monto del préstamo a la cuenta del socio
@@ -196,14 +195,14 @@ final class LoanController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        if ($loan->getStatus() !== 'PENDING') {
+        if ($loan->getStatus() !== 'SOLICITADO') {
             $this->addFlash('warning', 'Esta solicitud ya fue procesada.');
             return $this->redirectToRoute('app_loan_pending');
         }
 
         try {
             // 1. Cambiar estado a Rechazado
-            $loan->setStatus('REJECTED');
+            $loan->setStatus('RECHAZADO');
             $em->flush();
 
             // 2. Enviar correo de notificación de rechazo
@@ -271,7 +270,10 @@ final class LoanController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $approvedLoans = $loanRepository->findBy(['status' => 'APPROVED'], ['approvedAt' => 'DESC']);
+$approvedLoans = $loanRepository->findBy(
+    ['status' => 'APROBADO'],
+    ['approvalDate' => 'DESC']
+);
 
         return $this->render('loan/payments.html.twig', [
             'loans' => $approvedLoans,

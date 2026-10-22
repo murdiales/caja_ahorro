@@ -29,15 +29,15 @@ class LoanRepository extends ServiceEntityRepository
     public function getEstadoPrestamos(): array
     {
         $activos = $this->count([
-            'status' => 'ACTIVE'
+            'status' => 'ACTIVO'
         ]);
 
         $cerrados = $this->count([
-            'status' => 'PAID'
+            'status' => 'PAGADO'
         ]);
 
         $vencidos = $this->count([
-            'status' => 'OVERDUE'
+            'status' => 'VENCIDO'
         ]);
 
         return [

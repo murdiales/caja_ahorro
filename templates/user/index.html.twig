@@ -8,7 +8,7 @@
         {% for message in messages %}
             <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
                 {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endfor %}
     {% endfor %}
@@ -18,6 +18,23 @@
         <a href="{{ path('app_user_new') }}" class="btn btn-success fw-bold shadow-sm">
             <i class="bi bi-person-plus-fill"></i> Crear Nuevo Usuario
         </a>
+    </div>
+
+    {# Buscador dinámico antes de la tabla #}
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input
+                    type="text"
+                    id="userSearch"
+                    class="form-control"
+                    placeholder="Buscar por cédula, nombre o correo..."
+                >
+            </div>
+        </div>
     </div>
 
     <div class="card shadow-sm border-0">
@@ -45,30 +62,32 @@
                                     {% if 'ROLE_ADMIN' in user.roles %}
                                         <span class="badge bg-danger">ADMINISTRADOR</span>
                                     {% elseif 'ROLE_TREASURY' in user.roles %}
-                                        <span class="badge bg-warning text-dark">TESORERÍA</span>
+                                        <span class="badge bg-warning text-dark">TESORERO</span>
                                     {% elseif 'ROLE_SECRETARY' in user.roles %}
-                                        <span class="badge bg-info text-white">SECRETARÍA</span>
+                                        <span class="badge bg-info text-white">SECRETARIO</span>
                                     {% else %}
                                         <span class="badge bg-secondary">SOCIO / CLIENTE</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-1">
+                                    <div class="d-flex justify-content-center gap-2">
                                         {# Botón Reenviar Correo #}
                                         <form method="post" action="{{ path('app_user_resend_email', {id: user.id}) }}">
-                                            <button type="submit" class="btn btn-info btn-sm text-white fw-bold" title="Reenviar correo de activación">
-                                                <i class="bi bi-envelope-at-fill"></i> Enviar Email
+                                            <button type="submit"
+                                                    class="btn btn-outline-info btn-sm"
+                                                    title="Reenviar Correo">
+                                                <i class="bi bi-envelope-at-fill"></i>
                                             </button>
                                         </form>
 
                                         {# Botón Editar #}
-                                        <a href="{{ path('app_user_edit', {id: user.id}) }}" class="btn btn-warning btn-sm fw-bold text-dark" title="Editar datos del usuario">
+                                        <a href="{{ path('app_user_edit', {id: user.id}) }}" class="btn btn-outline-warning btn-sm" title="Editar">
                                             ✏️ Editar
                                         </a>
 
                                         {# Botón Eliminar #}
-                                        <form method="post" action="{{ path('app_user_delete', {id: user.id}) }}">
-                                            <button type="submit" class="btn btn-danger btn-sm fw-bold" onclick="return confirm('¿Está seguro de eliminar este usuario?');" title="Eliminar usuario">
+                                        <form method="post" action="{{ path('app_user_delete', {id: user.id}) }}" onsubmit="return confirm('¿Está seguro de eliminar este usuario?');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
                                                 🗑️ Eliminar
                                             </button>
                                         </form>
@@ -77,7 +96,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">No existen usuarios registrados.</td>
+                                <td colspan="6" class="text-center py-4 text-muted">No se encontraron usuarios registrados.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -86,4 +105,23 @@
         </div>
     </div>
 </div>
+
+{# Script JS para filtrado en tiempo real #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('userSearch');
+    if (!searchInput) return;
+    searchInput.addEventListener('keyup', function () {
+        const value = this.value.toLowerCase();
+        document.querySelectorAll('table tbody tr').forEach(function(row) {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(value)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
