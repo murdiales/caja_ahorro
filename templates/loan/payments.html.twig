@@ -1,9 +1,154 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Control de Pagos{% endblock %}
+{% block title %}Control de Pagos e Intereses{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h3>Control de Pagos</h3>
+<div class="container mt-4 mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-primary mb-0">
+                Control de Pagos de Préstamos
+            </h3>
+            <small class="text-muted">
+                Listado y control general de los pagos e intereses de los préstamos
+            </small>
+        </div>
+
+        <button onclick="window.print();" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-printer-fill me-1"></i>
+            Imprimir Reporte
+        </button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nº Préstamo</th>
+                            <th>Socio</th>
+                            <th class="text-end">Monto Original</th>
+                            <th class="text-center">Tasa Interés</th>
+                            <th class="text-end">Cuota Mensual</th>
+                            <th class="text-center">Estado</th>
+                            <th>Aprobado El</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for loan in loans %}
+                        <tr>
+
+                            <td>
+                                <code>#{{ loan.number ?: loan.id }}</code>
+                            </td>
+
+                            <td>
+                                {% if loan.account and loan.account.user %}
+                                    <strong>
+                                        {{ loan.account.user.firstName }}
+                                        {{ loan.account.user.lastName }}
+                                    </strong>
+                                {% else %}
+                                    <span class="text-muted">
+                                        Sin socio
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-end fw-bold text-success">
+                                ${{ loan.amount|number_format(2, '.', ',') }}
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-secondary">
+                                    {{ loan.interestRate }}%
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+
+                                {% if loan.termMonths > 0 and loan.totalAmount %}
+                                    <strong>
+                                        ${{ (loan.totalAmount / loan.termMonths)|number_format(2, '.', ',') }}
+                                    </strong>
+                                {% else %}
+                                    <span class="text-muted">
+                                        N/A
+                                    </span>
+                                {% endif %}
+
+                            </td>
+
+                            <td class="text-center">
+
+                                {% if loan.status == 'APROBADO' %}
+                                    <span class="badge bg-success">
+                                        APROBADO
+                                    </span>
+
+                                {% elseif loan.status == 'SOLICITADO' %}
+                                    <span class="badge bg-warning text-dark">
+                                        SOLICITADO
+                                    </span>
+
+                                {% elseif loan.status == 'DESEMBOLSADO' %}
+                                    <span class="badge bg-primary">
+                                        DESEMBOLSADO
+                                    </span>
+
+                                {% elseif loan.status == 'RECHAZADO' %}
+                                    <span class="badge bg-danger">
+                                        RECHAZADO
+                                    </span>
+
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        {{ loan.status }}
+                                    </span>
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {% if loan.approvalDate %}
+                                    {{ loan.approvalDate|date('d/m/Y H:i') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center">
+
+                                {{ path('loan_detail', {'id': loan.id}) }}
+                                    <i class="bi bi-eye"></i>
+                                    Ver
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% else %}
+
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                No hay préstamos registrados en el sistema.
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

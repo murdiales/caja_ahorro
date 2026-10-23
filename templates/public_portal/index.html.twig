@@ -40,6 +40,15 @@
         <div class="container py-3">
             <h1 class="display-4 fw-bold text-dark">{{ configs['site_title'] ?? 'Caja de Ahorro Familiar' }}</h1>
             <p class="lead text-muted col-md-8 mx-auto">{{ configs['hero_subtitle'] ?? 'Fomentando la cultura del ahorro y apoyo mutuo.' }}</p>
+
+        <div class="mt-4 d-flex justify-content-center gap-3">
+            <a href="{{ path('loan_simulator') }}" class="btn btn-primary btn-lg">
+                <i class="bi bi-calculator me-2"></i>Simular Préstamo
+            </a>
+            <a href="{{ path('app_login') }}" class="btn btn-outline-dark btn-lg">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+            </a>
+        </div>
         </div>
     </section>
 

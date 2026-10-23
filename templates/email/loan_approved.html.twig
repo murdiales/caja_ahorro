@@ -23,7 +23,7 @@
             <ul>
                 <li><strong>Monto Acreditado:</strong> ${{ loan.amount|number_format(2, '.', ',') }}</li>
                 <li><strong>Plazo:</strong> {{ loan.termMonths }} Meses</li>
-                <li><strong>Cuota Mensual:</strong> ${{ loan.monthlyFee|number_format(2, '.', ',') }}</li>
+                <li><strong>Cuota Mensual:</strong> ${{ ((loan.totalAmount / loan.termMonths))|number_format(2, '.', ',') }}</li>
                 <li><strong>Número de Cuenta:</strong> {{ loan.account.accountNumber }}</li>
             </ul>
             <hr>
