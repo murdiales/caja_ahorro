@@ -32,8 +32,14 @@
                         <li class="nav-item">
                             <a class="nav-link active" href="{{ path('app_home') }}">
                                 <i class="bi bi-house-door-fill"></i> Ventanilla
-                            </a>
-                        </li>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_indicator') }}">
+                            <i class="bi bi-graph-up"></i> Dashboard
+                        </a>
+                    </li>
+
 
                         {# Módulo 1: Administración de Cuentas #}
                         <li class="nav-item dropdown">
@@ -45,8 +51,6 @@
                                 <li><a class="dropdown-item" href="{{ path('app_user_new') }}"><i class="bi bi-person-plus-fill text-success"></i> Crear Usuario</a></li>
                                 <li><a class="dropdown-item" href="{{ path('app_user_index') }}"><i class="bi bi-person-lines-fill text-primary"></i> Listar / Editar / Eliminar Usuarios</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-menu-title dropdown-header fw-bold">Gestión de Cuentas</a></li>
-                                <li><a class="dropdown-item" href="/admin?crudAction=new&crudControllerFqcn=App%5CController%5CAdmin%5CAccountCrudController"><i class="bi bi-card-heading text-warning"></i> Crear Cuenta de Ahorro</a></li>
                             </ul>
                         </li>
 

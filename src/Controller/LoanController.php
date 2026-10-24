@@ -264,19 +264,54 @@ final class LoanController extends AbstractController
      * 4. CONTROL Y TABLA DE PAGOS
      */
     #[Route('/payments', name: 'app_loan_payments', methods: ['GET'])]
-    public function payments(LoanRepository $loanRepository): Response
+    public function payments(Request $request, LoanRepository $loanRepository): Response
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
 
-$approvedLoans = $loanRepository->findBy(
-    ['status' => 'APROBADO'],
-    ['approvalDate' => 'DESC']
-);
+        $period = $request->query->get('period', 'all');
+
+        $approvedLoans = $loanRepository->findBy(
+            ['status' => 'APROBADO'],
+            ['approvalDate' => 'DESC']
+        );
+
+        if ($period !== 'all') {
+
+            $fromDate = match ($period) {
+                '3m' => new \DateTime('-3 months'),
+                '6m' => new \DateTime('-6 months'),
+                '1y' => new \DateTime('-1 year'),
+                default => null
+            };
+
+            if ($fromDate) {
+                $approvedLoans = array_filter(
+                    $approvedLoans,
+                    fn($loan) =>
+                        $loan->getApprovalDate()
+                        && $loan->getApprovalDate() >= $fromDate
+                );
+            }
+        }
+
+        $totalLoans = count($approvedLoans);
+
+        $totalAmount = 0;
+        $totalInterest = 0;
+
+        foreach ($approvedLoans as $loan) {
+            $totalAmount += (float) $loan->getAmount();
+            $totalInterest += (float) ($loan->getTotalInterest() ?? 0);
+        }
 
         return $this->render('loan/payments.html.twig', [
             'loans' => $approvedLoans,
+            'period' => $period,
+            'totalLoans' => $totalLoans,
+            'totalAmount' => $totalAmount,
+            'totalInterest' => $totalInterest,
         ]);
     }
 }

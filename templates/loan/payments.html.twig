@@ -25,6 +25,49 @@
         <div class="card-body p-0">
             <div class="table-responsive">
 
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card border-primary shadow-sm">
+            <div class="card-body text-center">
+                <small class="text-muted">Préstamos</small>
+                <h3 class="mb-0">{{ totalLoans }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-success shadow-sm">
+            <div class="card-body text-center">
+                <small class="text-muted">Monto Prestado</small>
+                <h3 class="mb-0">$ {{ totalAmount|number_format(2, '.', ',') }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-warning shadow-sm">
+            <div class="card-body text-center">
+                <small class="text-muted">Interés Total</small>
+                <h3 class="mb-0">$ {{ totalInterest|number_format(2, '.', ',') }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-info shadow-sm">
+            <div class="card-body text-center">
+                <small class="text-muted">Período</small>
+<h3 class="mb-0">{% if period == '3m' %}3 Meses{% elseif period == '6m' %}6 Meses{% elseif period == '1y' %}1 Año{% else %}Todos{% endif %}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mb-3 d-flex gap-2">
+<a href="?period=3m" class="btn btn-outline-primary btn-sm">Últimos 3 meses</a>
+<a href="?period=6m" class="btn btn-outline-primary btn-sm">Últimos 6 meses</a>
+<a href="?period=1y" class="btn btn-outline-primary btn-sm">Último año</a>
+<a href="?period=all" class="btn btn-outline-secondary btn-sm">Todos</a>
+</div>
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
