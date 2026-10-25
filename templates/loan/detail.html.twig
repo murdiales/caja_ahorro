@@ -177,6 +177,7 @@
                         <th class="text-end py-2">Cuota</th>
                         <th class="text-end py-2">Saldo Fin.</th>
                         <th class="text-center py-2">Estado</th>
+                            <th class="text-center py-2">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -198,8 +199,19 @@
                                     <span class="badge bg-danger">VENCIDA</span>
                                 {% else %}
                                     <span class="badge bg-secondary">{{ installment.status }}</span>
-                                {% endif %}
-                            </td>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if installment.status in ['PENDIENTE','SOLICITADO'] %}
+                                <a href="#" class="btn btn-sm btn-outline-success" title="Registrar pago">
+                                    <i class="bi bi-cash-coin"></i> Pagar
+                                </a>
+                            {% else %}
+                                <span class="text-success fw-bold">
+                                    <i class="bi bi-check-circle"></i>
+                                </span>
+                            {% endif %}
+                        </td>
                         </tr>
                     {% endfor %}
                 </tbody>

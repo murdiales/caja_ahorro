@@ -165,14 +165,19 @@
                                 {% endif %}
                             </td>
 
-                            <td class="text-center">
+                    <td class="text-center">
+                        <a href="{{ path('loan_detail', {'id': loan.id}) }}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                            <i class="bi bi-eye"></i>
+                        </a>
 
-                                {{ path('loan_detail', {'id': loan.id}) }}
-                                    <i class="bi bi-eye"></i>
-                                    Ver
-                                </a>
+                        <a href="{{ path('loan_detail', {'id': loan.id}) }}" class="btn btn-sm btn-outline-secondary" title="Tabla de amortización">
+                            <i class="bi bi-card-list"></i>
+                        </a>
 
-                            </td>
+                        <a href="{{ path('app_loan_payments') }}" class="btn btn-sm btn-outline-success" title="Registrar pago">
+                            <i class="bi bi-cash-coin"></i>
+                        </a>
+                    </td>
 
                         </tr>
 
