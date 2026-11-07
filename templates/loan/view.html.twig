@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Detalle del Préstamo{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                📋 Detalle del Préstamo
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h4>{{ loan.number }}</h4>
+                </div>
+
+                <div class="col-md-6 text-end">
+
+                    {% if loan.status == 'APROBADO' %}
+                        <span class="badge bg-success fs-6">
+                            APROBADO
+                        </span>
+                    {% elseif loan.status == 'RECHAZADO' %}
+                        <span class="badge bg-danger fs-6">
+                            RECHAZADO
+                        </span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark fs-6">
+                            PENDIENTE
+                        </span>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+
+                            <h5>💰 Información Financiera</h5>
+
+                            <p><strong>Monto:</strong>
+                                ${{ loan.amount|number_format(2) }}
+                            </p>
+
+                            <p><strong>Interés:</strong>
+                                {{ loan.interestRate }}%
+                            </p>
+
+                            <p><strong>Plazo:</strong>
+                                {{ loan.termMonths }} meses
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+
+                            <h5>👤 Información del Socio</h5>
+
+                            <p><strong>Cuenta:</strong>
+                                {{ loan.account.accountNumber }}
+                            </p>
+
+                            <p><strong>Socio:</strong>
+                                {{ loan.account.user.firstName }}
+                                {{ loan.account.user.lastName }}
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="text-center mt-4">
+
+                <a
+                    href="/loan/loan/{{ loan.id }}/schedule"
+                    class="btn btn-success"
+                >
+                    📄 Ver Tabla de Amortización
+                </a>
+
+                <a
+                    href="/loan/history"
+                    class="btn btn-secondary"
+                >
+                    ↩ Volver
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

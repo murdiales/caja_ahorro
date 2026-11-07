@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Transaction;
 use App\Repository\AccountRepository;
+use App\Repository\LoanRepository;
+use App\Repository\LoanInstallmentRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\TransactionRepository;
 use App\Service\TransactionService;
 use Exception;
@@ -48,8 +51,8 @@ final class TransactionController extends AbstractController
             '203-Multa',
             '204-Cobro emisión libreta',
             '205-Venta',
-            '301-Pago capital préstamo',
-            '206-Pago intereses',
+            '301-Pago cuota préstamo',
+        '302-Pago intereses préstamo',
             '207-Actividades sociales',
         ];
 
@@ -251,4 +254,54 @@ final class TransactionController extends AbstractController
 
         return $this->redirectToRoute('app_transaction_receipt', ['id' => $transaction->getId()]);
     }
+
+    #[Route('/deposit/loan-info/{accountId}', name: 'deposit_loan_info', methods: ['GET'])]
+    public function loanInfo(
+        int $accountId,
+        LoanRepository $loanRepository
+    ): JsonResponse
+    {
+        $loan = $loanRepository->findOneBy(
+            [
+                'account' => $accountId,
+                'status' => 'APROBADO'
+            ],
+            [
+                'id' => 'DESC'
+            ]
+        );
+
+        if (!$loan) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
+
+        $installments = $loan->getInstallments();
+
+        $nextInstallment = null;
+
+        foreach ($installments as $installment) {
+
+            if ($installment->getStatus() !== 'PAGADO') {
+                $nextInstallment = $installment;
+                break;
+            }
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'loan' => $loan->getNumber(),
+            'balance' => $nextInstallment
+                ? $nextInstallment->getClosingBalance()
+                : 0,
+            'installment' => $nextInstallment
+                ? $nextInstallment->getInstallmentAmount()
+                : 0,
+            'dueDate' => $nextInstallment && $nextInstallment->getDueDate()
+                ? $nextInstallment->getDueDate()->format('d/m/Y')
+                : '--/--/----'
+        ]);
+    }
+
 }

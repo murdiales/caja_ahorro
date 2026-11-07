@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Loan;
 use App\Repository\AccountRepository;
 use App\Repository\LoanRepository;
+use App\Repository\LoanInstallmentRepository;
 use App\Service\TransactionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\LoanRequestService;
 
 #[Route('/loan')]
 final class LoanController extends AbstractController
@@ -25,7 +27,8 @@ final class LoanController extends AbstractController
     public function requestLoan(
         Request $request,
         AccountRepository $accountRepository,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        LoanRequestService $loanRequestService
     ): Response {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
@@ -61,7 +64,6 @@ final class LoanController extends AbstractController
             }
 
             $account = $accountRepository->find($accountId);
-
             if (
                 !$this->isGranted('ROLE_ADMIN')
                 && !$this->isGranted('ROLE_TESORERO')
@@ -91,18 +93,19 @@ final class LoanController extends AbstractController
                 $monthlyInterest = ($interestRate / 100) / 12;
                 $monthlyFee = ($amount * $monthlyInterest) / (1 - pow(1 + $monthlyInterest, -$termMonths));
 
-                $loan = new Loan();
-                $loan->setAccount($account);
-                $loan->setAmount((string) $amount);
-                $loan->setTermMonths($termMonths);
-                $loan->setInterestRate((string) $interestRate);
-                $loan->setStatus('SOLICITADO');
-                $loan->setRequestDate(new \DateTimeImmutable());
-
-                $em->persist($loan);
-                $em->flush();
-
-                $this->addFlash('success', '¡Solicitud de préstamo registrada con éxito! En espera de aprobación.');
+        $firstDueDate = (new DateTimeImmutable())->modify("+1 month");
+        try {
+            $loan = $loanRequestService->create(
+                $account,
+                (float) $amount,
+                $termMonths,
+                (float) $interestRate,
+                $firstDueDate
+            );
+        } catch (\Throwable $e) {
+            die($e->getMessage());
+        }
+        $this->addFlash('success', '✅ ¡TU SOLICITUD HA SIDO ENVIADA CON ÉXITO! Su solicitud se encuentra pendiente de revisión y aprobación.');
                 return $this->redirectToRoute('app_loan_pending');
             }
         }
@@ -138,6 +141,7 @@ final class LoanController extends AbstractController
         Loan $loan,
         TransactionService $transactionService,
         EntityManagerInterface $em,
+        LoanRequestService $loanRequestService,
         MailerInterface $mailer
     ): Response {
         if (!$this->getUser()) {
@@ -172,9 +176,12 @@ final class LoanController extends AbstractController
                     'loan' => $loan,
                 ]));
 
-            $mailer->send($email);
+            try {
+                $mailer->send($email);
+            } catch (\Throwable $e) {
+            }
 
-            $this->addFlash('success', sprintf('¡Préstamo #%d aprobado, acreditado y notificado por correo!', $loan->getId()));
+            $this->addFlash('success', sprintf('¡Préstamo #%d aprobado y acreditado correctamente!', $loan->getId()));
         } catch (Exception $e) {
             $this->addFlash('danger', 'Error al procesar la aprobación: ' . $e->getMessage());
         }
@@ -189,6 +196,7 @@ final class LoanController extends AbstractController
     public function rejectLoan(
         Loan $loan,
         EntityManagerInterface $em,
+        LoanRequestService $loanRequestService,
         MailerInterface $mailer
     ): Response {
         if (!$this->getUser()) {
@@ -215,8 +223,10 @@ final class LoanController extends AbstractController
                     'loan' => $loan,
                 ]));
 
-            $mailer->send($email);
-
+            try {
+                $mailer->send($email);
+            } catch (\Throwable $e) {
+            }
             $this->addFlash('info', sprintf('La solicitud de préstamo #%d ha sido rechazada y notificada.', $loan->getId()));
         } catch (Exception $e) {
             $this->addFlash('danger', 'Error al procesar el rechazo: ' . $e->getMessage());
@@ -314,4 +324,48 @@ final class LoanController extends AbstractController
             'totalInterest' => $totalInterest,
         ]);
     }
+
+
+    #[Route('/loan/{id}', name: 'loan_view')]
+    #[Route('/loan/{id}', name: 'loan_view')]
+    public function viewLoan(Loan $loan): Response
+    {
+        return $this->render('loan/view.html.twig', [
+            'loan' => $loan,
+        ]);
+    }
+
+    #[Route('/loan/{id}/notify', name: 'loan_notify')]
+    public function notifyLoan(Loan $loan): Response
+    {
+        return new Response(
+            'Notificar préstamo #' . $loan->getId()
+        );
+    }
+    #[Route('/loan/{id}/schedule', name: 'loan_schedule')]
+    public function scheduleLoan(
+        Loan $loan,
+        LoanInstallmentRepository $installmentRepository
+    ): Response
+    {
+        $installments = $installmentRepository->findBy([
+            'loan' => $loan
+        ]);
+
+        return $this->render('loan/schedule.html.twig', [
+            'loan' => $loan,
+            'installments' => $installments,
+        ]);
+    }
+
+    #[Route('/loan/{id}/pay', name: 'loan_pay')]
+    public function payLoan(
+        Loan $loan
+    ): Response
+    {
+        return new Response(
+            'Registrar pago préstamo #' . $loan->getId()
+        );
+    }
+
 }

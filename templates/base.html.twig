@@ -72,7 +72,7 @@
                                 <i class="bi bi-bank"></i> Préstamos
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('app_loan_request') }}"><i class="bi bi-file-earmark-plus text-success"></i> Nueva Solicitud</a></li>
+                                <li><a class="dropdown-item" href="{{ path('loan_request_new') }}"><i class="bi bi-file-earmark-plus text-success"></i> Nueva Solicitud</a></li>
                             <li><a class="dropdown-item" href="{{ path('loan_simulator') }}"><i class="bi bi-calculator me-1"></i> Simulador de Préstamos</a></li>
                                 <li><a class="dropdown-item" href="{{ path('app_loan_pending') }}"><i class="bi bi-clock-history text-warning"></i> Solicitudes y Aprobaciones</a></li>
                                 <li><a class="dropdown-item" href="{{ path('app_loan_payments') }}"><i class="bi bi-calculator text-primary"></i> Control de Pagos e Intereses</a></li>
@@ -134,6 +134,17 @@
         {% endif %}
 
         <main class="py-4">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="container mt-3">
+                    <div class="alert alert-{{ label }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
             {% block body %}{% endblock %}
         </main>
 

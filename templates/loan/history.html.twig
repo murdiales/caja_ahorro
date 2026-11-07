@@ -23,7 +23,7 @@
                             <th>Monto</th>
                             <th>Plazo</th>
                             <th>Estado</th>
-                            <th>Fecha Solicitud</th>
+                            <th>Fecha Solicitud</th><th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,15 +35,24 @@
                                 <td class="fw-bold">${{ loan.amount|number_format(2, '.', ',') }}</td>
                                 <td>{{ loan.termMonths }} Meses</td>
                                 <td>
-                                    {% if loan.status == 'SOLICITADO' %}
-                                        <span class="badge bg-warning text-dark">PENDIENTE</span>
-                                    {% elseif loan.status == 'APROBADO' %}
-                                        <span class="badge bg-success">APROBADO</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">{{ loan.status }}</span>
-                                    {% endif %}
+                    {% if loan.status == 'SOLICITADO' %}
+                        <span class="badge bg-warning text-dark">PENDIENTE</span>
+                    {% elseif loan.status == 'APROBADO' %}
+                        <span class="badge bg-success">APROBADO</span>
+                    {% elseif loan.status == 'RECHAZADO' %}
+                        <span class="badge bg-danger">RECHAZADO</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ loan.status }}</span>
+                    {% endif %}
                                 </td>
                                 <td class="small">{{ loan.requestDate|date('d/m/Y H:i') }}</td>
+                    <td>
+                        <a href="/loan/loan/{{ loan.id }}" class="btn btn-sm btn-primary">👁 Ver</a>
+                        <a href="/loan/loan/{{ loan.id }}/notify" class="btn btn-sm btn-info">📧 Notificar</a>
+                        {% if loan.status == 'APROBADO' %}
+                            <a href="/loan/loan/{{ loan.id }}/schedule" class="btn btn-sm btn-success">📄 Tabla</a>
+                        {% endif %}
+                    </td>
                             </tr>
                         {% else %}
                             <tr>

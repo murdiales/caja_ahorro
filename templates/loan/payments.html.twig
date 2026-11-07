@@ -68,9 +68,9 @@
 <a href="?period=1y" class="btn btn-outline-primary btn-sm">Último año</a>
 <a href="?period=all" class="btn btn-outline-secondary btn-sm">Todos</a>
 </div>
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead class="table-dark text-center">
+                        <tr class="align-middle">
                             <th>Nº Préstamo</th>
                             <th>Socio</th>
                             <th class="text-end">Monto Original</th>
@@ -87,28 +87,33 @@
                         <tr>
 
                             <td>
-                                <code>#{{ loan.number ?: loan.id }}</code>
+                                <span class="badge bg-light text-danger border fs-6">#{{ loan.number ?: loan.id }}</span>
                             </td>
 
-                            <td>
-                                {% if loan.account and loan.account.user %}
-                                    <strong>
-                                        {{ loan.account.user.firstName }}
-                                        {{ loan.account.user.lastName }}
-                                    </strong>
-                                {% else %}
-                                    <span class="text-muted">
-                                        Sin socio
-                                    </span>
-                                {% endif %}
-                            </td>
+<td>
+    {% if loan.account and loan.account.user %}
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width:36px;height:36px;font-size:14px;">
+                {{ loan.account.user.firstName|first|upper }}
+            </div>
+            <div>
+                <div class="fw-bold">
+                    {{ loan.account.user.firstName }} {{ loan.account.user.lastName }}
+                </div>
+                <small class="text-muted">Socio activo</small>
+            </div>
+        </div>
+    {% else %}
+        <span class="text-muted">Sin socio</span>
+    {% endif %}
+</td>
 
                             <td class="text-end fw-bold text-success">
                                 ${{ loan.amount|number_format(2, '.', ',') }}
                             </td>
 
                             <td class="text-center">
-                                <span class="badge bg-secondary">
+                                <span class="badge rounded-pill bg-primary">
                                     {{ loan.interestRate }}%
                                 </span>
                             </td>
@@ -130,12 +135,12 @@
                             <td class="text-center">
 
                                 {% if loan.status == 'APROBADO' %}
-                                    <span class="badge bg-success">
+                                    <span class="badge rounded-pill bg-success px-3">
                                         APROBADO
                                     </span>
 
                                 {% elseif loan.status == 'SOLICITADO' %}
-                                    <span class="badge bg-warning text-dark">
+                                    <span class="badge rounded-pill bg-warning text-dark px-3">
                                         SOLICITADO
                                     </span>
 
@@ -150,7 +155,7 @@
                                     </span>
 
                                 {% else %}
-                                    <span class="badge bg-secondary">
+                                    <span class="badge rounded-pill bg-primary">
                                         {{ loan.status }}
                                     </span>
                                 {% endif %}
@@ -164,20 +169,23 @@
                                     N/A
                                 {% endif %}
                             </td>
+<td class="text-center">
 
-                    <td class="text-center">
-                        <a href="{{ path('loan_detail', {'id': loan.id}) }}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
-                            <i class="bi bi-eye"></i>
-                        </a>
+    <a href="{{ path('loan_schedule', {'id': loan.id}) }}"
+       class="btn btn-sm btn-outline-secondary"
+       title="Cuotas y amortización">
+        <i class="bi bi-calendar-check"></i>
+    </a>
 
-                        <a href="{{ path('loan_detail', {'id': loan.id}) }}" class="btn btn-sm btn-outline-secondary" title="Tabla de amortización">
-                            <i class="bi bi-card-list"></i>
-                        </a>
+    <a href="{{ path('loan_pay', {'id': loan.id}) }}"
+       class="btn btn-sm btn-outline-success"
+       title="Gestión de pagos">
+        <i class="bi bi-cash-coin"></i>
+    </a>
+</td>
+</tr>
 
-                        <a href="{{ path('app_loan_payments') }}" class="btn btn-sm btn-outline-success" title="Registrar pago">
-                            <i class="bi bi-cash-coin"></i>
-                        </a>
-                    </td>
+</td>
 
                         </tr>
 

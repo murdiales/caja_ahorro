@@ -3,12 +3,76 @@
 namespace App\Controller;
 
 use App\Repository\LoanRepository;
+use App\Repository\AccountRepository;
+use App\Service\LoanRequestService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class LoanRequestController extends AbstractController
 {
+    #[Route('/loan/request2', name: 'loan_request_new', methods: ['GET','POST'])]
+    public function create(
+        Request $request,
+        AccountRepository $accountRepository,
+        LoanRequestService $loanRequestService
+    ): Response {
+
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $accounts = $accountRepository->findAll();
+
+        if ($request->isMethod('POST')) {
+
+            $accountId = (int) $request->request->get('account_id');
+            $amount = (float) $request->request->get('amount');
+            $termMonths = (int) $request->request->get('term_months');
+
+            $account = $accountRepository->find($accountId);
+
+            if (!$account) {
+
+                $this->addFlash(
+                    'danger',
+                    'La cuenta seleccionada no existe.'
+                );
+
+                return $this->redirectToRoute(
+                    'loan_request_new'
+                );
+            }
+
+            $loanRequestService->create(
+                $account,
+                $amount,
+                $termMonths,
+                12,
+                (new \DateTimeImmutable())
+                    ->modify('+1 month')
+            );
+
+            $this->addFlash(
+                'success',
+                '✅ Solicitud realizada con éxito. Se encuentra en estado de revisión y pendiente de aprobación.'
+            );
+
+            return $this->redirectToRoute(
+                'app_loan_pending'
+            );
+        }
+
+        return $this->render(
+            'loan/request.html.twig',
+            [
+                'accounts' => $accounts,
+                'selectedAccountId' => null,
+            ]
+        );
+    }
+
     #[Route('/loans/requests', name: 'loan_requests')]
     public function index(
         LoanRepository $loanRepository

@@ -79,6 +79,68 @@
                     </select>
                 </div>
 
+<div id="loan-info" class="alert alert-info mt-3" style="display:none;">
+    <h6 class="fw-bold mb-3">💳 Información del préstamo</h6>
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <strong>Préstamo:</strong><br>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const reason = document.getElementById("description");
+    const loanInfo = document.getElementById("loan-info");
+
+    function validateReason() {
+
+        if (reason.value.startsWith("301")) {
+            loanInfo.style.display = "block";
+        } else {
+            loanInfo.style.display = "none";
+        }
+
+    }
+
+    reason.addEventListener("change", validateReason);
+
+});
+</script>
+            <span id="loan-number">Seleccione una cuenta</span>
+        </div>
+
+        <div class="col-md-6">
+            <strong>Saldo pendiente:</strong><br>
+            <span id="loan-balance">$0.00</span>
+        </div>
+
+    </div>
+
+<div class="mt-3">
+    <label class="form-label fw-bold">Préstamo</label>
+    <select id="loan_id" name="loan_id" class="form-select">
+        <option value="">Seleccione un préstamo</option>
+    </select>
+</div>
+
+    <hr>
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <strong>Próxima cuota:</strong><br>
+            <span id="loan-installment">$0.00</span>
+        </div>
+
+        <div class="col-md-6">
+            <strong>Vencimiento:</strong><br>
+            <span id="loan-date">--/--/----</span>
+        </div>
+
+    </div>
+
+</div>
+
                 <div class="d-flex justify-content-between pt-2">
                     <a href="{{ path('app_home') }}" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn btn-success fw-bold">Confirmar Depósito</button>
@@ -86,5 +148,56 @@
             </form>
         </div>
     </div>
+<script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const reason = document.getElementById("description");
+    const account = document.getElementById("account_id");
+    const loanInfo = document.getElementById("loan-info");
+
+    function toggleLoanInfo() {
+
+        if (reason.value.startsWith("301")) {
+            loanInfo.style.display = "block";
+            loadLoanInfo();
+        } else {
+            loanInfo.style.display = "none";
+        }
+    }
+
+    function loadLoanInfo() {
+
+        if (!account.value) {
+            return;
+        }
+
+        fetch("/transaction/deposit/loan-info/" + account.value)
+            .then(response => response.json())
+            .then(data => {
+
+                if (!data.success) {
+
+                    document.getElementById("loan-number").innerText = "Sin préstamo activo";
+                    document.getElementById("loan-balance").innerText = "$0.00";
+                    document.getElementById("loan-installment").innerText = "$0.00";
+                    document.getElementById("loan-date").innerText = "--/--/----";
+
+                    return;
+                }
+
+                document.getElementById("loan-number").innerText = data.loan;
+                document.getElementById("loan-balance").innerText = "$" + data.balance;
+                document.getElementById("loan-installment").innerText = "$" + data.installment;
+                document.getElementById("loan-date").innerText = data.dueDate;
+            });
+    }
+
+    reason.addEventListener("change", toggleLoanInfo);
+    account.addEventListener("change", loadLoanInfo);
+
+    toggleLoanInfo();
+});
+</script>
 </div>
 {% endblock %}
