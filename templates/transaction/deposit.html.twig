@@ -86,26 +86,6 @@
 
         <div class="col-md-6">
             <strong>Préstamo:</strong><br>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const reason = document.getElementById("description");
-    const loanInfo = document.getElementById("loan-info");
-
-    function validateReason() {
-
-        if (reason.value.startsWith("301")) {
-            loanInfo.style.display = "block";
-        } else {
-            loanInfo.style.display = "none";
-        }
-
-    }
-
-    reason.addEventListener("change", validateReason);
-
-});
-</script>
             <span id="loan-number">Seleccione una cuenta</span>
         </div>
 
@@ -122,6 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <option value="">Seleccione un préstamo</option>
     </select>
 </div>
+
 
     <hr>
 
@@ -148,56 +129,53 @@ document.addEventListener("DOMContentLoaded", function () {
             </form>
         </div>
     </div>
-<script>
+</div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
     const reason = document.getElementById("description");
     const account = document.getElementById("account_id");
     const loanInfo = document.getElementById("loan-info");
+    const loanSelect = document.getElementById("loan_id");
+
+    function loadLoans() {
+
+        if (!account.value) return;
+
+        fetch("/transaction/deposit/loans/" + account.value)
+            .then(response => response.json())
+            .then(loans => {
+
+                loanSelect.innerHTML = "";
+
+                const defaultOption = document.createElement("option");
+                defaultOption.value = "";
+                defaultOption.textContent = "Seleccione un préstamo";
+                loanSelect.appendChild(defaultOption);
+
+                loans.forEach(function(loan) {
+                    const option = document.createElement("option");
+                    option.value = loan.id;
+                    option.textContent = loan.number;
+                    loanSelect.appendChild(option);
+                });
+
+            });
+    }
 
     function toggleLoanInfo() {
 
         if (reason.value.startsWith("301")) {
             loanInfo.style.display = "block";
-            loadLoanInfo();
+            loadLoans();
         } else {
             loanInfo.style.display = "none";
         }
     }
 
-    function loadLoanInfo() {
-
-        if (!account.value) {
-            return;
-        }
-
-        fetch("/transaction/deposit/loan-info/" + account.value)
-            .then(response => response.json())
-            .then(data => {
-
-                if (!data.success) {
-
-                    document.getElementById("loan-number").innerText = "Sin préstamo activo";
-                    document.getElementById("loan-balance").innerText = "$0.00";
-                    document.getElementById("loan-installment").innerText = "$0.00";
-                    document.getElementById("loan-date").innerText = "--/--/----";
-
-                    return;
-                }
-
-                document.getElementById("loan-number").innerText = data.loan;
-                document.getElementById("loan-balance").innerText = "$" + data.balance;
-                document.getElementById("loan-installment").innerText = "$" + data.installment;
-                document.getElementById("loan-date").innerText = data.dueDate;
-            });
-    }
-
     reason.addEventListener("change", toggleLoanInfo);
-    account.addEventListener("change", loadLoanInfo);
+    account.addEventListener("change", loadLoans);
 
-    toggleLoanInfo();
 });
 </script>
-</div>
 {% endblock %}

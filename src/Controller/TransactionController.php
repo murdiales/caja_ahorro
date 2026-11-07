@@ -304,4 +304,33 @@ final class TransactionController extends AbstractController
         ]);
     }
 
+
+    #[Route('/deposit/loans/{accountId}', name: 'deposit_loans', methods: ['GET'])]
+    public function loansByAccount(
+        int $accountId,
+        LoanRepository $loanRepository
+    ): JsonResponse
+    {
+        $loans = $loanRepository->findBy(
+            [
+                'account' => $accountId,
+                'status' => 'APROBADO'
+            ],
+            [
+                'id' => 'DESC'
+            ]
+        );
+
+        $data = [];
+
+        foreach ($loans as $loan) {
+            $data[] = [
+                'id' => $loan->getId(),
+                'number' => $loan->getNumber(),
+            ];
+        }
+
+        return new JsonResponse($data);
+    }
+
 }
