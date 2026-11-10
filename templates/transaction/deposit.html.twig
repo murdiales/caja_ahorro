@@ -111,6 +111,9 @@
         <div class="col-md-6">
             <strong>Próxima cuota:</strong><br>
             <span id="loan-installment">$0.00</span>
+        <br>
+        <strong>Cuota:</strong><br>
+        <span id="loan-number-installment">#0</span>
         </div>
 
         <div class="col-md-6">
@@ -119,7 +122,6 @@
         </div>
 
     </div>
-
 </div>
 
                 <div class="d-flex justify-content-between pt-2">
@@ -163,6 +165,33 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
+    function loadInstallmentInfo() {
+
+        if (!loanSelect.value) return;
+
+        fetch("/transaction/deposit/installment-info/" + loanSelect.value)
+            .then(response => response.json())
+            .then(data => {
+
+                if (!data.success) {
+
+                    document.getElementById("loan-balance").innerText = "$0.00";
+                    document.getElementById("loan-installment").innerText = "$0.00";
+                document.getElementById("loan-number-installment").innerText = "#" + data.installmentNumber;
+                    document.getElementById("loan-date").innerText = "--/--/----";
+
+                    return;
+                }
+
+                document.getElementById("loan-balance").innerText = "$" + data.balance;
+                document.getElementById("loan-installment").innerText = "$" + data.installmentAmount;
+                document.getElementById("loan-number").innerText = loanSelect.options[loanSelect.selectedIndex].text;
+                document.getElementById("loan-date").innerText = data.dueDate;
+
+            });
+    }
+
+
     function toggleLoanInfo() {
 
         if (reason.value.startsWith("301")) {
@@ -175,6 +204,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     reason.addEventListener("change", toggleLoanInfo);
     account.addEventListener("change", loadLoans);
+    loanSelect.addEventListener("change", loadInstallmentInfo);
 
 });
 </script>

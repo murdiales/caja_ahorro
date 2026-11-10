@@ -83,14 +83,22 @@ final class TransactionController extends AbstractController
 
             $description = $request->request->get('description');
 
+            $loanId = $request->request->get('loan_id');
+
             $selectedAccount = $accountRepository->find($accountId);
 
             if (!$selectedAccount) {
                 $this->addFlash('danger', 'La cuenta seleccionada no existe.');
             } else {
                 try {
-                    $transaction = $transactionService->deposit($selectedAccount, $amount, $description,$transactionDate);
 
+                        $transaction = $transactionService->deposit(
+                            $selectedAccount,
+                            $amount,
+                            $description,
+                            $transactionDate,
+                            $loanId ? (int) $loanId : null
+                        );
                     $this->addFlash('success', '¡Depósito realizado con éxito!');
                     return $this->redirectToRoute('app_transaction_receipt', ['id' => $transaction->getId()]);
                 } catch (Exception $e) {
@@ -151,6 +159,8 @@ final class TransactionController extends AbstractController
             $accountId = $request->request->get('account_id');
             $amount = (float) $request->request->get('amount');
             $description = $request->request->get('description');
+
+            $loanId = $request->request->get('loan_id');
 
             $selectedAccount = $accountRepository->find($accountId);
 
@@ -332,5 +342,41 @@ final class TransactionController extends AbstractController
 
         return new JsonResponse($data);
     }
+
+
+    #[Route('/deposit/installment-info/{loanId}', name: 'deposit_installment_info', methods: ['GET'])]
+    public function installmentInfo(
+        int $loanId,
+        LoanInstallmentRepository $installmentRepository
+    ): JsonResponse
+    {
+        $installment = $installmentRepository->findOneBy(
+            [
+                'loan' => $loanId,
+                'status' => 'PENDIENTE'
+            ],
+            [
+                'installmentNumber' => 'ASC'
+            ]
+        );
+
+        if (!$installment) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'installmentNumber' => $installment->getInstallmentNumber(),
+            'installmentAmount' => $installment->getInstallmentAmount(),
+            'balance' => $installment->getClosingBalance(),
+            'dueDate' => $installment->getDueDate()
+                ? $installment->getDueDate()->format('d/m/Y')
+                : '--/--/----'
+        ]);
+    }
+
+
 
 }

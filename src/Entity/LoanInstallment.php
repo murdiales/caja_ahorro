@@ -27,6 +27,10 @@ class LoanInstallment
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2)]
     private ?string $installmentAmount = null;
 
+    #[ORM\Column(length: 15, options: ["default" => "0.00"])]
+    private ?string $paidAmount = "0.00";
+
+
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2)]
     private ?string $closingBalance = null;
 
@@ -103,6 +107,19 @@ class LoanInstallment
     public function setInstallmentAmount(string $installmentAmount): static
     {
         $this->installmentAmount = $installmentAmount;
+
+        return $this;
+    }
+
+
+    public function getPaidAmount(): ?string
+    {
+        return $this->paidAmount;
+    }
+
+    public function setPaidAmount(string $paidAmount): static
+    {
+        $this->paidAmount = $paidAmount;
 
         return $this;
     }

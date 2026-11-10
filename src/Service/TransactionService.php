@@ -4,20 +4,25 @@ namespace App\Service;
 
 use App\Entity\Account;
 use App\Entity\Transaction;
+use App\Repository\LoanInstallmentRepository;
+use App\Repository\LoanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-
 class TransactionService
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private LoanInstallmentRepository $loanInstallmentRepository,
+        private LoanRepository $loanRepository
+    )
     {
     }
 
     /**
      * Registra un Depósito en la Cuenta
      */
-    public function deposit(Account $account, float $amount, ?string $description = null, ?\DateTimeInterface $transactionDate = null): Transaction
-        {
+    public function deposit(Account $account, float $amount, ?string $description = null, ?\DateTimeInterface $transactionDate = null, ?int $loanId = null): Transaction
+    {
         if ($amount <= 0) {
             throw new Exception('El monto a depositar debe ser mayor a cero.');
         }

@@ -37,4 +37,18 @@ class LoanInstallmentRepository extends ServiceEntityRepository
     {
         return $this->count([]);
     }
-}
+
+    public function findNextPendingInstallment(int $loanId): ?LoanInstallment
+    {
+        return $this->createQueryBuilder("i")
+            ->andWhere("i.loan = :loan")
+            ->andWhere("i.status IN (:statuses)")
+            ->setParameter("loan", $loanId)
+            ->setParameter("statuses", ["PENDIENTE", "PARCIAL"])
+            ->orderBy("i.installmentNumber", "ASC")
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    }
