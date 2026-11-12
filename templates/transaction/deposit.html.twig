@@ -185,6 +185,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 document.getElementById("loan-balance").innerText = "$" + data.balance;
                 document.getElementById("loan-installment").innerText = "$" + data.installmentAmount;
+        document.getElementById("loan-number-installment").innerText = "#" + data.installmentNumber;
                 document.getElementById("loan-number").innerText = loanSelect.options[loanSelect.selectedIndex].text;
                 document.getElementById("loan-date").innerText = data.dueDate;
 

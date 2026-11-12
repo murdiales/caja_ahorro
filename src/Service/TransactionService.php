@@ -29,7 +29,70 @@ class TransactionService
 
         $this->entityManager->beginTransaction();
         try {
-            $newBalance = (float) $account->getCurrentBalance() + $amount;
+            
+        if (
+            $description === '301-Pago cuota préstamo'
+            && $loanId
+        ) {
+
+            $installment =
+                $this->loanInstallmentRepository
+                    ->findNextPendingInstallment($loanId);
+
+            if (!$installment) {
+                throw new Exception("NO ENCONTRO CUOTA PARA LOAN ID " . $loanId);
+            }
+
+
+
+            if (!$installment) {
+                throw new \Exception(
+                    'NO ENCONTRO CUOTA PARA LOAN ID ' . $loanId
+                );
+            }
+
+
+            if ($installment) {
+
+                $currentPaid =
+                    (float) $installment->getPaidAmount();
+
+                $installmentAmount =
+                    (float) $installment->getInstallmentAmount();
+
+                $newPaid =
+                    $currentPaid + $amount;
+
+                $remaining =
+                    $installmentAmount - $newPaid;
+
+                $installment->setPaidAmount(
+                    number_format(
+                        min($newPaid, $installmentAmount),
+                        2,
+                        '.',
+                        ''
+                    )
+                );
+
+
+                if ($remaining > 0) {
+
+                    $installment->setStatus('PARCIAL');
+
+                } else {
+
+                    $installment->setStatus('PAGADO');
+
+                    $installment->setPaidAt(
+                        new \DateTimeImmutable()
+                    );
+                }
+            }
+        }
+
+
+        $newBalance = (float) $account->getCurrentBalance() + $amount;
             $account->setCurrentBalance((string) $newBalance);
 
             if (!$transactionDate) {$transactionDate = new \DateTime();
